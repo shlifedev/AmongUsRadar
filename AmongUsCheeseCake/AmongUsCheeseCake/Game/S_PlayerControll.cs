@@ -2,13 +2,23 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace AmongUsCheeseCake.Game
 { 
     [System.Serializable]
+    [StructLayout(LayoutKind.Sequential)]
     public class S_PlayerControll
     {
+        public static S_PlayerControll FromBytes(byte[] bytes)
+        {
+            GCHandle gcHandle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
+            var data = (S_PlayerControll)Marshal.PtrToStructure(gcHandle.AddrOfPinnedObject(), typeof(S_PlayerControll));
+            gcHandle.Free();
+            return data;
+        }
+
         public UIntPtr m_cachedPtr;
         public uint spawnId;
         public uint netId;

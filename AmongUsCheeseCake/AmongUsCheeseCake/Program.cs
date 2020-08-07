@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using AmongUsCheeseCake.Game;
 using Memory;
 namespace AmongUsCheeseCake
 {
@@ -13,18 +15,18 @@ namespace AmongUsCheeseCake
         static public Mem m = new Mem();  
         static void Main(string[] args)
         {
-            while (true)
+            unsafe
             {
+                while (true)
+                {
+                    var size = Marshal.SizeOf(typeof(S_PlayerControll)); 
+                    if (m.OpenProcess("Among us"))
+                    {  
+                        var data = m.ReadBytes("Among us.exe+06854D20", size);
+                        var info = S_PlayerControll.FromBytes(data);
 
-                if (m.OpenProcess("Among us"))
-                { 
-                    var x = m.AoBScan("00 30 42 1A ?? ?? ?? ??");  
-                    x.Wait();
-
-                    foreach(var m in x.Result)
-                    {
-                        Console.WriteLine(m);
-                    } 
+                        Console.WriteLine(info.killTimer);
+                    }
                 }
             }
         }
