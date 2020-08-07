@@ -11,6 +11,7 @@ namespace AmongUsCheeseCake
 {
     /// <summary>
     /// 해당 치트는 플레이어의 첫번째 인스턴스 배열을 찾으면 된다.
+    /// 가이드 : 킬타이머 offset찾은이후 offset -44 = base Position => monodissert에서 pBase찾기
     /// </summary>
     class Program
     {
@@ -112,7 +113,7 @@ namespace AmongUsCheeseCake
 
                         //읽어온 벡터정보 
                         S_Vector2 vec2 = S_Vector2.FromBytes(vec2Data);
-                        Console.WriteLine($"\t\t\tㄴptr:{netTransform} x:{vec2.x},y:{vec2.y}");
+                        Co nsole.WriteLine($"\t\t\tㄴptr:{netTransform} x:{vec2.x},y:{vec2.y}");
                     }
                     System.Threading.Thread.Sleep(100);
                 }
