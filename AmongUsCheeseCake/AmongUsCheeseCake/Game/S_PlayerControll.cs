@@ -5,49 +5,49 @@ using System.Linq;
 using System.Text;
 
 namespace AmongUsCheeseCake.Game
-{
+{ 
     [System.Serializable]
     public class S_PlayerControll
     {
-        public int m_cachedPtr;
-        public int spawnId;
-        public int netId;
-        public int DirtyBits;
-        public int SpawnFlags; 
-        public int sendMode;
-        public int OwnerId;
-        public int DespawnOnDestroy;
-        public int LastStartCounter;
-        public int PlayerId;
-        public int MaxReportDistance;
-        public int moveable;
-        public int inVent;
-        public int _cachedData;
-        public int FootSteps; 
-        public int KillSfx;
-        public int KillAnimations;
-        public int killTimer;
-        public int RemainingEmergencies;
-        public int nameText;
-        public int LightPrefab;
-        public int myLight;
-        public int Collider;
-        public int MyPhysics;
-        public int NetTransform;
-        public int CurrentPet;
-        public int HatRenderer;
-        public int myRend;
-        public int hitBuffer; 
-        public int myTasks;
-        public int ScannerAnims;
-        public int ScannersImages;
-        public int closest;
-        public int isNew;
-        public int cache;
-        public int itemsInRange;
-        public int newItemsInRange;
-        public int scannerCount;
-        public int infectedSet; 
+        public UIntPtr m_cachedPtr;
+        public uint spawnId;
+        public uint netId;
+        public uint DirtyBits;
+        public uint SpawnFlags; 
+        public uint sendMode;
+        public uint OwnerId;
+        public byte DespawnOnDestroy;
+        public Int32 LastStartCounter;
+        public byte PlayerId;
+        public Single MaxReportDistance;
+        public Boolean moveable;
+        public Boolean inVent;
+        public UIntPtr _cachedData;
+        public UIntPtr FootSteps; 
+        public UIntPtr KillSfx;  
+        public UIntPtr KillAnimations;
+        public Single killTimer;
+        public Int32 RemainingEmergencies;
+        public UIntPtr nameText;
+        public UIntPtr LightPrefab;
+        public UIntPtr myLight;
+        public UIntPtr Collider;
+        public UIntPtr MyPhysics;
+        public UIntPtr NetTransform;
+        public UIntPtr CurrentPet;
+        public UIntPtr HatRenderer;
+        public UIntPtr myRend;
+        public UIntPtr hitBuffer; 
+        public UIntPtr myTasks;
+        public UIntPtr ScannerAnims;
+        public UIntPtr ScannersImages;
+        public UIntPtr closest;
+        public Boolean isNew;
+        public UIntPtr cache;
+        public UIntPtr itemsInRange;
+        public UIntPtr newItemsInRange;
+        public Byte scannerCount;
+        public Boolean infectedSet; 
 
     }
 } 
