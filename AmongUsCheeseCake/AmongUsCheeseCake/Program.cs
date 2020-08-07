@@ -113,7 +113,7 @@ namespace AmongUsCheeseCake
 
                         //읽어온 벡터정보 
                         S_Vector2 vec2 = S_Vector2.FromBytes(vec2Data);
-                        Co nsole.WriteLine($"\t\t\tㄴptr:{netTransform} x:{vec2.x},y:{vec2.y}");
+                        Console.WriteLine($"\t\t\tㄴptr:{netTransform} x:{vec2.x},y:{vec2.y}");
                     }
                     System.Threading.Thread.Sleep(100);
                 }
