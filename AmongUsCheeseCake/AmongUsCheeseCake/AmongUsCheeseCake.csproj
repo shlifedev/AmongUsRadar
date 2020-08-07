@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Game\S_PlayerControll.cs" />
+    <Compile Include="Game\S_Vector2.cs" />
     <Compile Include="Game\XmlOffsetGenerator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

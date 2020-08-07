@@ -15,9 +15,7 @@ namespace AmongUsCheeseCake
     class Program
     {
         /*Memory Ref https://github.com/shlifedev/memory.dll*/
-        static public Mem m = new Mem();
-
-
+        static public Mem m = new Mem(); 
         public static List<UIntPtr> datas = new List<UIntPtr>() {
             new UIntPtr(0x06854960),
             new UIntPtr(0x06854A00),
@@ -26,7 +24,7 @@ namespace AmongUsCheeseCake
             new UIntPtr(0x06854BE0)
         };
         static void Main(string[] args)
-        {
+        { 
             string FIRST_PLAYER_OFFSET = "06854D20";
 
             Console.WriteLine("----포인터 디버거---");
@@ -37,14 +35,12 @@ namespace AmongUsCheeseCake
                 UIntPtr y = (UIntPtr)datas[i+1];
                 Console.WriteLine(x.ToString() + "\t" + y.ToString() + " offset distance " + ((int)y - (int)x));
             }
-            Console.WriteLine("----포인터 디버거---");
-
-
+            Console.WriteLine("----포인터 디버거---"); 
 
 
             unsafe
             {
-                Console.WriteLine("PID\tVent\tKillTimer");
+                Console.WriteLine("PID\tVent\tKillTimer\tNetTransform");
                 while (true)
                 {
                     if (m.OpenProcess("Among us"))
@@ -52,8 +48,14 @@ namespace AmongUsCheeseCake
                         var size = S_PlayerControll.SizeOf();
                         var data = m.ReadBytes($"{FIRST_PLAYER_OFFSET}", size);
                         var info = S_PlayerControll.FromBytes(data);
-                        Console.WriteLine($"{info.PlayerId}\t{info.inVent}\t{info.killTimer}");
-                     }
+              
+                        Console.WriteLine($"{info.PlayerId}\t{info.inVent}\t{info.killTimer}\t{info.NetTransform}");
+
+                        var vec2Hex = (m.ReadUIntPtr(info.NetTransform)+68).ToString("X");
+                        var vec2Data= m.ReadBytes($"{vec2Hex}", 8);
+                        S_Vector2 vec2 = S_Vector2.FromBytes(vec2Data);
+                        Console.WriteLine($"\t\t\tㄴ{vec2.x},{vec2.y}");
+                    }
                     System.Threading.Thread.Sleep(100);
                 }
             }
