@@ -10,7 +10,7 @@ namespace AmongUsCheeseCake
     class Program
     {
         /*Memory Ref https://github.com/shlifedev/memory.dll*/
-        static public Mem m = new Mem(); 
+        static public Mem m = new Mem();  
         static void Main(string[] args)
         {
             while (true)
@@ -18,15 +18,13 @@ namespace AmongUsCheeseCake
 
                 if (m.OpenProcess("Among us"))
                 { 
-                    var x = m.AoBScan("?? ?? ?? 0A ?? ?? 0F");
+                    var x = m.AoBScan("00 30 42 1A ?? ?? ?? ??");  
                     x.Wait();
-                    var result = x.Result;
 
-                    foreach(var m in result)
+                    foreach(var m in x.Result)
                     {
-                        Console.WriteLine(result.Count());
-                    }
-                    Console.WriteLine(x);
+                        Console.WriteLine(m);
+                    } 
                 }
             }
         }
