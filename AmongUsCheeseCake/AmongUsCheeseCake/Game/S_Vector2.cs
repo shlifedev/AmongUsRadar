@@ -15,7 +15,7 @@ namespace AmongUsCheeseCake.Game
         public float x,y;
         public static S_Vector2 FromBytes(byte[] bytes)
         {
-            GCHandle gcHandle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
+            GCHandle gcHandle = GCHandle.Alloc(bytes, GCHandleType.Pinned); 
             var data = (S_Vector2)Marshal.PtrToStructure(gcHandle.AddrOfPinnedObject(), typeof(S_Vector2));
             gcHandle.Free();
             return data;

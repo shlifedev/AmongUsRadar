@@ -37,7 +37,7 @@ namespace AmongUsCheeseCake.Game
         public byte PlayerId;
         public Single MaxReportDistance;
         public bool moveable;
-        public bool inVent;
+        public byte inVent;
         public UIntPtr _cachedData;
         public UIntPtr FootSteps; 
         public UIntPtr KillSfx;  
