@@ -19,19 +19,25 @@ namespace AmongUsCheeseCake.Game
             return data;
         }
 
+        public static int SizeOf()
+        {
+            var size = Marshal.SizeOf(typeof(S_PlayerControll));;
+            return size;
+        }
+
         public UIntPtr m_cachedPtr;
         public uint spawnId;
         public uint netId;
         public uint DirtyBits;
-        public uint SpawnFlags; 
-        public uint sendMode;
+        public int SpawnFlags; 
+        public bool sendMode;
         public uint OwnerId;
         public byte DespawnOnDestroy;
         public Int32 LastStartCounter;
         public byte PlayerId;
         public Single MaxReportDistance;
-        public Boolean moveable;
-        public Boolean inVent;
+        public bool moveable;
+        public bool inVent;
         public UIntPtr _cachedData;
         public UIntPtr FootSteps; 
         public UIntPtr KillSfx;  
