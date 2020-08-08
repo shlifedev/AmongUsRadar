@@ -24,26 +24,29 @@ namespace AmongUsCheeseCake.Game
             var size = Marshal.SizeOf(typeof(S_PlayerControll));;
             return size;
         }
+        public static UIntPtr GameOptions;
+        public static UIntPtr LocalPlayer;
+        public static UIntPtr AllPlayerControls;
 
         public UIntPtr m_cachedPtr;
         public uint spawnId;
         public uint netId;
         public uint DirtyBits;
-        public int SpawnFlags; 
-        public bool sendMode;
-        public uint OwnerId;
-        public byte DespawnOnDestroy;
-        public Int32 LastStartCounter;
+        public byte SpawnFlags; 
+        public byte sendMode;
+        public int OwnerId;
+        public bool DespawnOnDestroy;
+        public int LastStartCounter;
         public byte PlayerId;
-        public Single MaxReportDistance;
+        public float MaxReportDistance;
         public bool moveable;
         public byte inVent;
         public UIntPtr _cachedData;
         public UIntPtr FootSteps; 
         public UIntPtr KillSfx;  
         public UIntPtr KillAnimations;
-        public Single killTimer;
-        public Int32 RemainingEmergencies;
+        public float killTimer;
+        public int RemainingEmergencies;
         public UIntPtr nameText;
         public UIntPtr LightPrefab;
         public UIntPtr myLight;
@@ -58,7 +61,7 @@ namespace AmongUsCheeseCake.Game
         public UIntPtr ScannerAnims;
         public UIntPtr ScannersImages;
         public UIntPtr closest;
-        public Boolean isNew;
+        public bool isNew;
         public UIntPtr cache;
         public UIntPtr itemsInRange;
         public UIntPtr newItemsInRange;

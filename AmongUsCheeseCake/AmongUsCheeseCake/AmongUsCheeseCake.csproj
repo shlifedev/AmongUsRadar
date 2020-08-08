@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>AmongUsCheeseCake</RootNamespace>
     <AssemblyName>AmongUsCheeseCake</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
@@ -35,8 +35,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Memory">
-      <HintPath>..\..\..\memory.dll\Memory\bin\Debug\Memory.dll</HintPath>
+    <Reference Include="Memory, Version=1.2.19.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Memory.dll.1.2.19\lib\net461\Memory.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -51,14 +51,19 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Game\S_GameData.cs" />
+    <Compile Include="Game\S_InnerNetObject.cs" />
+    <Compile Include="Game\S_PlayerInfo.cs" />
     <Compile Include="Game\S_PlayerControll.cs" />
     <Compile Include="Game\S_Vector2.cs" />
+    <Compile Include="Game\DumpEnum.cs" />
     <Compile Include="Game\XmlOffsetGenerator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

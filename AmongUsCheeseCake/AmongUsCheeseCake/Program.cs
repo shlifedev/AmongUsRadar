@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using AmongUsCheeseCake.Game;
 using Memory;
@@ -29,95 +30,104 @@ namespace AmongUsCheeseCake
         {
             public S_PlayerControll _instance;
             public S_Vector2 vec2;
+            public string hex;
+            public int size = 0;
+            public void ReadMemory()
+            {  
+                var data          = m.ReadBytes($"{hex}", size); 
+                var instance = S_PlayerControll.FromBytes(data);
+                this._instance = instance;
+            }
+            public void ReadPos()
+            {
+                int _offset_vec2_position = 80;
+                int _offset_vec2_sizeOf = 8;
+
+                var netTransform = ((int)_instance.NetTransform + _offset_vec2_position).ToString("X");
+                var vec2Data= m.ReadBytes($"{netTransform}",_offset_vec2_sizeOf); // 주소로부터 8바이트 읽는다   
+                this.vec2 = S_Vector2.FromBytes(vec2Data);
+            }
+        } 
+        static List<playerData> playerControllList = new List<playerData>(); 
+        static void log(string tag, Object log)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write($"[{tag}] ");
+            Console.Write($"{log}\n");
+             
         }
-
-        static List<playerData> playerControllList = new List<playerData>();
-
-
-
+   
         static void readPlayerList(string base_offset, int player_count)
         {
-            var size = S_PlayerControll.SizeOf();
+            var size = S_PlayerControll.SizeOf() + 4;
+            log("player struct size", $"{size} byte ");
             for (int i = 0; i < player_count; i++)
             {
-                var nextOffset = int.Parse(base_offset, System.Globalization.NumberStyles.HexNumber); 
-                nextOffset = nextOffset + (i * size); 
-                var nextOffsetHex = nextOffset.ToString("X"); 
-                var data = m.ReadBytes($"{nextOffsetHex}", size); 
-                var info = S_PlayerControll.FromBytes(data) ;
-
-                if (info != null)
-                    playerControllList.Add(new playerData() {
-                        _instance = info
-                    });
-                else
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("cannot add player");
-                    Console.ForegroundColor = ConsoleColor.White;
-                }
+                var nextOffset    = int.Parse(base_offset, System.Globalization.NumberStyles.HexNumber);
+                nextOffset = nextOffset + (size * i);
+                var nextOffsetHex = nextOffset.ToString("X");
+                var pd = new playerData();
+                pd.hex = nextOffsetHex;
+                pd.size = size;
+                pd.ReadMemory();
+                playerControllList.Add(pd);
             }
         }
-
-        static void updatePos()
-        {
-            foreach(var player in playerControllList)
-            {
-                //플레이어의 netTransform 포인터가 가르키는 값의 80 = x,y값 (80~88범위)
-                var netTransform = ((int)player._instance.NetTransform + 80).ToString("X");
-                var vec2Data= m.ReadBytes($"{netTransform}", 8); // 주소로부터 8바이트 읽는다   
-                player.vec2 = S_Vector2.FromBytes(vec2Data); 
-                Console.WriteLine(player.vec2.x);
-            }
-        }
-
-
-        static void Main(string[] args)
-        { 
-            string FIRST_PLAYER_OFFSET = "06A94D20"; 
-            Console.WriteLine("----포인터 디버거---");
-            Console.WriteLine("주소A\t주소B\t계산결과");
-            for (int i = 0; i < datas.Count - 1; i++)
-            {
-                UIntPtr x = (UIntPtr)datas[i];
-                UIntPtr y = (UIntPtr)datas[i+1];
-                Console.WriteLine(x.ToString() + "\t" + y.ToString() + " offset distance " + ((int)y - (int)x));
-            }
-            Console.WriteLine("----포인터 디버거---");
 
    
-            unsafe
+        static void updatePos()
+        {
+           
+            string log = null;
+            foreach(var player in playerControllList)
+            { 
+                player.ReadMemory(); 
+                player.ReadPos();
+                log += $"Player{player._instance.netId} => x{player.vec2.x} y{player.vec2.y}\n";
+            } 
+            Console.WriteLine(log);
+        }
+        
+        static void ReadTest()
+        {
+            if (m.OpenProcess("Among Us"))
             {
-                m.OpenProcess("Among us");
-                readPlayerList("06A94D20", 3);
-                updatePos();
-
-                Console.WriteLine("PID\tVent\tKillTimer\tNetTransform");
+                Console.WriteLine(S_PlayerControll.SizeOf());
+                readPlayerList("073D4D20", 1);
                 while (true)
                 {
-                    if (m.OpenProcess("Among us"))
-                    {
-                    
-
-                        //플레이어 정보 가져오기
-                        var size = S_PlayerControll.SizeOf();
-                        var data = m.ReadBytes($"{FIRST_PLAYER_OFFSET}", size);
-                        var info = S_PlayerControll.FromBytes(data); 
-                        Console.WriteLine($"{info.PlayerId}\t{info.inVent}\t{info.killTimer}\t{info.NetTransform}");
-
-        
-                        
-                        //플레이어의 netTransform 포인터가 가르키는 값의 80 = x,y값 (80~88범위)
-                        var netTransform = ((int)info.NetTransform + 80).ToString("X"); 
-                        var vec2Data= m.ReadBytes($"{netTransform}", 8); // 주소로부터 8바이트 읽는다 
-
-                        //읽어온 벡터정보 
-                        S_Vector2 vec2 = S_Vector2.FromBytes(vec2Data);
-                        Console.WriteLine($"\t\t\tㄴptr:{netTransform} x:{vec2.x},y:{vec2.y}");
-                    }
-                    System.Threading.Thread.Sleep(100);
+                    updatePos();
+                    Thread.Sleep(20);
+                    Console.Clear();
                 }
+
             }
+        }
+         static void Readtest2(string dummyInstanceOffset)
+        {
+            Console.WriteLine(S_GameData.SizeOf());
+
+            // 쓰레기 힙에 더미로 생성된 S_GameData정보
+            var dummyInstanceByte = m.ReadBytes(dummyInstanceOffset, S_GameData.SizeOf());
+            var data = S_GameData.FromBytes(dummyInstanceByte); 
+            var singletonHex = data.Instance_Dummy.ToString("X"); 
+          
+            log("GameData Singleton Hex", singletonHex); 
+           
+            // GameData의 실제 싱글톤
+            var singletonHexDummy = int.Parse(singletonHex, System.Globalization.NumberStyles.HexNumber) - 8;
+            var realInstanceHex = singletonHexDummy.ToString("X");
+            log("GameData Singleton realInstanceHex", realInstanceHex); 
+
+            var realInstanceByte = m.ReadBytes(realInstanceHex, S_GameData.SizeOf());
+
+        }
+        static void Main(string[] args)
+        { 
+            var c =  m.OpenProcess("Among us");
+            //ReadTest();
+            Readtest2("044B6860"); 
+            System.Threading.Thread.Sleep(1000000);
         }
     }
 }
