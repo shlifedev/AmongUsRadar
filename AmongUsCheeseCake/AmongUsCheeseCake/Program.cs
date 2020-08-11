@@ -23,8 +23,8 @@ namespace AmongUsCheeseCake
         static string GetAddress(int value) { return value.ToString("X"); }
         static string GetAddress(uint value) { return value.ToString("X"); }
 
-        static string PlayerControllPattern = "08 47 6E 07 ?? ?? ?? ??";
-        static string GameDataPattern = "88 FB 3B 07 ?? ?? ?? ??"; 
+        static string PlayerControllPattern = "48 52 06 11 ?? ?? ?? ??";
+        static string GameDataPattern = "A8 A4 B0 06 ?? ?? ?? ??"; 
         static List<S_PlayerControll> SearchPlayerInfoList()
         {
             List<S_PlayerControll> list = new List<S_PlayerControll>();
@@ -46,7 +46,7 @@ namespace AmongUsCheeseCake
         static Dictionary<int, S_Vector2> UpdatedVectorDictionary = new Dictionary<int, S_Vector2>();
         static void UpdatePlayerList()
         {
-            int _offset_vec2_position = 80;
+            int _offset_vec2_position = 60;
             int _offset_vec2_sizeOf = 8;
             int idx = 0;
             foreach (var x in S_PlayerControllList)
@@ -65,7 +65,7 @@ namespace AmongUsCheeseCake
                         var originalData = UpdatedVectorDictionary[idx]; 
                         var currentVec = vec2;
                         if (originalData.x != currentVec.x)
-                        {
+                        { 
                             Console.WriteLine("Player ID : " + x.PlayerId + "    X " + currentVec.x + ", Y " + currentVec.y);
                         } 
                     } 
@@ -118,13 +118,8 @@ namespace AmongUsCheeseCake
             if (open)
             {
                 while (true)
-                {
-              
-                    UpdatePlayerList();
-             
-              
-
-                   
+                { 
+                    UpdatePlayerList(); 
                 }
             }
 
