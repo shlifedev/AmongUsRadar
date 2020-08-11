@@ -23,10 +23,8 @@ namespace AmongUsCheeseCake
         static string GetAddress(int value) { return value.ToString("X"); }
         static string GetAddress(uint value) { return value.ToString("X"); }
 
-        static string GameDataPattern = "08 77 CA 06 ?? ?? ?? ??";
-        static string PlayerControllPattern = "B0 EF 0D 11 ?? ?? ?? ??";
-
-
+        static string PlayerControllPattern = "08 47 6E 07 ?? ?? ?? ??";
+        static string GameDataPattern = "88 FB 3B 07 ?? ?? ?? ??"; 
         static List<S_PlayerControll> SearchPlayerInfoList()
         {
             List<S_PlayerControll> list = new List<S_PlayerControll>();
@@ -37,9 +35,9 @@ namespace AmongUsCheeseCake
             Console.WriteLine("instanced S_PlayerInfo offset count : => " + results.Count());
             foreach (var x in results)
             {
-                var bytes = m.ReadBytes(GetAddress(x), S_PlayerControll.SizeOf());
-                var playerControll = S_PlayerControll.FromBytes(bytes); 
-                list.Add(playerControll);
+                var bytes = m.ReadBytes(GetAddress(x), S_PlayerControll.SizeOf()); 
+                var playerControll = S_PlayerControll.FromBytes(bytes);   
+                list.Add(playerControll); 
             }
             return list;
         }
@@ -54,17 +52,13 @@ namespace AmongUsCheeseCake
             foreach (var x in S_PlayerControllList)
             {
                 var netTransform = ((int)x.NetTransform + _offset_vec2_position).ToString("X"); 
-                var vec2Data= m.ReadBytes($"{netTransform}",_offset_vec2_sizeOf); // 주소로부터 8바이트 읽는다  
+                var vec2Data= m.ReadBytes($"{netTransform}",_offset_vec2_sizeOf); // 주소로부터 8바이트 읽는다   
                 if (vec2Data != null && vec2Data.Length != 0)
                 {
                     var vec2 = S_Vector2.FromBytes(vec2Data);  
                     if(UpdatedVectorDictionary.ContainsKey(idx) == false)
-                    { 
-                        if ( (vec2.x < 100 && vec2.x > -100) && (vec2.y < 100 && vec2.y > -100))
-                        {
-                            UpdatedVectorDictionary.Add(idx, vec2);
-                            Console.WriteLine(idx + "added" +","+ vec2.x.ToString("0.0") +","+ vec2.y.ToString("0.0"));
-                        }
+                    {  
+                            UpdatedVectorDictionary.Add(idx, vec2);  
                     }
                     else
                     {
@@ -72,8 +66,8 @@ namespace AmongUsCheeseCake
                         var currentVec = vec2;
                         if (originalData.x != currentVec.x)
                         {
-                            Console.WriteLine(originalData.x + "," + currentVec.x);
-                        }
+                            Console.WriteLine(x.PlayerId + "    " + currentVec.x + "," + currentVec.y);
+                        } 
                     } 
                     idx++;
                 }
@@ -109,15 +103,15 @@ namespace AmongUsCheeseCake
 
 
         static void Main(string[] args)
-        {
+       {
             Console.ForegroundColor = ConsoleColor.White;
             var open =  m.OpenProcess("Among us");
-
             S_PlayerControllList = SearchPlayerInfoList();
             if (open)
             {
                 while (true)
                 {
+              
                     UpdatePlayerList();
                     var gameDataOffset = FindGameDataInstance();
                     var bytes = m.ReadBytes(gameDataOffset, S_GameData.SizeOf());

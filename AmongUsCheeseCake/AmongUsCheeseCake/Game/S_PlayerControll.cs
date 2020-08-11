@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 
 namespace AmongUsCheeseCake.Game
-{ 
+{
     [System.Serializable]
     [StructLayout(LayoutKind.Sequential)]
     public class S_PlayerControll
@@ -18,35 +18,32 @@ namespace AmongUsCheeseCake.Game
             gcHandle.Free();
             return data;
         }
-  
+
         public static int SizeOf()
         {
-            var size = Marshal.SizeOf(typeof(S_PlayerControll));;
+            var size = Marshal.SizeOf(typeof(S_PlayerControll)); ;
             return size;
         }
-        public static UIntPtr GameOptions;
-        public static UIntPtr LocalPlayer;
-        public static UIntPtr AllPlayerControls;
 
         public UIntPtr m_cachedPtr;
         public uint spawnId;
         public uint netId;
         public uint DirtyBits;
-        public byte SpawnFlags; 
-        public byte sendMode;
-        public int OwnerId;
-        public bool DespawnOnDestroy;
-        public int LastStartCounter;
+        public int SpawnFlags;
+        public bool sendMode;
+        public uint OwnerId;
+        public byte DespawnOnDestroy;
+        public Int32 LastStartCounter;
         public byte PlayerId;
-        public float MaxReportDistance;
+        public Single MaxReportDistance;
         public bool moveable;
         public byte inVent;
         public UIntPtr _cachedData;
-        public UIntPtr FootSteps; 
-        public UIntPtr KillSfx;  
+        public UIntPtr FootSteps;
+        public UIntPtr KillSfx;
         public UIntPtr KillAnimations;
-        public float killTimer;
-        public int RemainingEmergencies;
+        public Single killTimer;
+        public Int32 RemainingEmergencies;
         public UIntPtr nameText;
         public UIntPtr LightPrefab;
         public UIntPtr myLight;
@@ -56,17 +53,17 @@ namespace AmongUsCheeseCake.Game
         public UIntPtr CurrentPet;
         public UIntPtr HatRenderer;
         public UIntPtr myRend;
-        public UIntPtr hitBuffer; 
+        public UIntPtr hitBuffer;
         public UIntPtr myTasks;
         public UIntPtr ScannerAnims;
         public UIntPtr ScannersImages;
         public UIntPtr closest;
-        public bool isNew;
+        public Boolean isNew;
         public UIntPtr cache;
         public UIntPtr itemsInRange;
         public UIntPtr newItemsInRange;
         public Byte scannerCount;
-        public Boolean infectedSet; 
+        public Boolean infectedSet;
 
     }
-} 
+}
