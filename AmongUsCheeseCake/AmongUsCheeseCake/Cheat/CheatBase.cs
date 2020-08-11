@@ -15,7 +15,7 @@ namespace AmongUsCheeseCake.Cheat
 {
     public class CheatBase
     {
-        static string PlayerControllPattern = "48 52 06 11 ?? ?? ?? ??";
+        static string PlayerControllPattern = "10 5E 79 11 ?? ?? ?? ??";
         static string GameDataPattern = "A8 A4 B0 06 ?? ?? ?? ??";
 
         public static Mem Memory = new Mem();
@@ -60,6 +60,7 @@ namespace AmongUsCheeseCake.Cheat
             foreach (var x in SearchedPlayerList)
             {
                 var vec2 = x.GetSyncPosition();
+
                 if (vec2.IsZero() == false)
                 {
                     if (UpdatedVectorDictionary.ContainsKey(idx) == false)
@@ -71,7 +72,7 @@ namespace AmongUsCheeseCake.Cheat
                         var originalData = UpdatedVectorDictionary[idx];
                         var currentVec = vec2;
                         if (originalData.x != currentVec.x || originalData.y != currentVec.y)
-                        { 
+                        {
                             if (RealPlayerInstancePID.ContainsKey(x.PlayerId) == false)
                             {
                                 RealPlayerInstance.Add(x);
@@ -83,6 +84,7 @@ namespace AmongUsCheeseCake.Cheat
                 idx++;
             }
         }
+         
 
 
 
@@ -164,7 +166,7 @@ namespace AmongUsCheeseCake.Cheat
             Console.WriteLine("Tick Thread!");
             while (true)
             {
-                UpdatePlayerList();
+                UpdatePlayerList(); 
                 UpdatePlayerPosition();
                 System.Threading.Thread.Sleep(10);
             }
