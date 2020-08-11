@@ -24,8 +24,61 @@ namespace AmongUsCheeseCake
         static string GetAddress(uint value) { return value.ToString("X"); }
 
         static string GameDataPattern = "08 77 CA 06 ?? ?? ?? ??";
+        static string PlayerControllPattern = "B0 EF 0D 11 ?? ?? ?? ??";
 
 
+        static List<S_PlayerControll> SearchPlayerInfoList()
+        {
+            List<S_PlayerControll> list = new List<S_PlayerControll>();
+            var result = m.AoBScan(PlayerControllPattern, true, true);
+            result.Wait();
+            var results =    result.Result;
+
+            Console.WriteLine("instanced S_PlayerInfo offset count : => " + results.Count());
+            foreach (var x in results)
+            {
+                var bytes = m.ReadBytes(GetAddress(x), S_PlayerControll.SizeOf());
+                var playerControll = S_PlayerControll.FromBytes(bytes); 
+                list.Add(playerControll);
+            }
+            return list;
+        }
+
+        static List<S_PlayerControll> S_PlayerControllList = null;
+        static Dictionary<int, S_Vector2> UpdatedVectorDictionary = new Dictionary<int, S_Vector2>();
+        static void UpdatePlayerList()
+        {
+            int _offset_vec2_position = 80;
+            int _offset_vec2_sizeOf = 8;
+            int idx = 0;
+            foreach (var x in S_PlayerControllList)
+            {
+                var netTransform = ((int)x.NetTransform + _offset_vec2_position).ToString("X"); 
+                var vec2Data= m.ReadBytes($"{netTransform}",_offset_vec2_sizeOf); // 주소로부터 8바이트 읽는다  
+                if (vec2Data != null && vec2Data.Length != 0)
+                {
+                    var vec2 = S_Vector2.FromBytes(vec2Data);  
+                    if(UpdatedVectorDictionary.ContainsKey(idx) == false)
+                    { 
+                        if ( (vec2.x < 100 && vec2.x > -100) && (vec2.y < 100 && vec2.y > -100))
+                        {
+                            UpdatedVectorDictionary.Add(idx, vec2);
+                            Console.WriteLine(idx + "added" +","+ vec2.x.ToString("0.0") +","+ vec2.y.ToString("0.0"));
+                        }
+                    }
+                    else
+                    {
+                        var originalData = UpdatedVectorDictionary[idx]; 
+                        var currentVec = vec2;
+                        if (originalData.x != currentVec.x)
+                        {
+                            Console.WriteLine(originalData.x + "," + currentVec.x);
+                        }
+                    } 
+                    idx++;
+                }
+            }
+        }
         /// <summary>
         /// 데이터를 찾는 비용이 크므로 1회성 실행한다.
         /// </summary>
@@ -36,7 +89,7 @@ namespace AmongUsCheeseCake
             var result = m.AoBScan(GameDataPattern, true, true);
             result.Wait();
             var results =    result.Result;
-            Console.WriteLine("instanced gamedata offset count : => " + results.Count());
+            Console.WriteLine("instanced S_GameData offset count : => " + results.Count());
             foreach (var x in results)
             {
                 var bytes = m.ReadBytes(GetAddress(x), S_GameData.SizeOf());
@@ -59,17 +112,21 @@ namespace AmongUsCheeseCake
         {
             Console.ForegroundColor = ConsoleColor.White;
             var open =  m.OpenProcess("Among us");
+
+            S_PlayerControllList = SearchPlayerInfoList();
             if (open)
             {
                 while (true)
                 {
-
+                    UpdatePlayerList();
                     var gameDataOffset = FindGameDataInstance();
                     var bytes = m.ReadBytes(gameDataOffset, S_GameData.SizeOf());
                     var gameData = S_GameData.FromBytes(bytes);
+                    Console.WriteLine(gameData.TotalTasks + "개의 미션중 " + gameData.CompletedTasks + " 개 완료함");
+                     
+              
 
-                    Console.WriteLine(gameData.TotalTasks + "개의 미션중 " + gameData.CompletedTasks + " 개 완료함"); 
-                    var ppp = m.ReadBytes(gameData.AllPlayers.ToUInt32().ToString("X"), S_PlayerInfo.SizeOf()); 
+
                 }
             }
 

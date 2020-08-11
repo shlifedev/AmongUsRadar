@@ -36,8 +36,8 @@ namespace AmongUsCheeseCake.Game
             var size = Marshal.SizeOf(typeof(List<S_PlayerInfo>)); ;
             return size;
         }
-        public readonly byte PlayerId;
-        public string PlayerName;
+        public byte PlayerId;
+        public UIntPtr PlayerName;
         public byte ColorId;
         public uint HatId;
         public uint PetId;
