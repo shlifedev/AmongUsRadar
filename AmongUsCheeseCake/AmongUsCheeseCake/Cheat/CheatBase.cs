@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AmongUsCheeseCake.Cheat
@@ -27,7 +28,9 @@ namespace AmongUsCheeseCake.Cheat
 
         private string m_cached_gameDataOffset = null;
 
-
+        private List<S_PlayerControll> S_PlayerControllList = new List<S_PlayerControll>();
+        private Dictionary<int, Vector2> UpdatedVectorDictionary = new Dictionary<int, Vector2>();
+        private Thread tickThread = null;
         List<S_PlayerControll> SearchPlayerInfoList()
         {
             List<S_PlayerControll> list = new List<S_PlayerControll>();
@@ -44,7 +47,35 @@ namespace AmongUsCheeseCake.Cheat
         }
 
 
-       
+         
+        void UpdatePlayerList()
+        {
+            int idx = 0;
+            foreach (var x in S_PlayerControllList)
+            {
+                var vec2 = x.GetSyncPosition();
+                if (vec2.IsZero() == false)
+                {
+                    if (UpdatedVectorDictionary.ContainsKey(idx) == false)
+                    {
+                        UpdatedVectorDictionary.Add(idx, vec2);
+                    }
+                    else
+                    {
+                        var originalData = UpdatedVectorDictionary[idx];
+                        var currentVec = vec2;
+                        if (originalData.x != currentVec.x || originalData.y != currentVec.y)
+                        {
+                            Console.WriteLine("Player ID : " + x.PlayerId + "    X " + currentVec.x + ", Y " + currentVec.y + ",  " + x.NetTransform);
+                        }
+                    }
+                }
+                idx++;
+            }
+        }
+
+
+
         /// <summary>
         /// 게임데이터 오프셋을 새로고침함
         /// </summary>
@@ -65,12 +96,36 @@ namespace AmongUsCheeseCake.Cheat
                     offset = x.GetAddress();
             }
             this.m_cached_gameDataOffset = offset;
+        } 
+    
+        public void Init()
+        {
+            var b = Memory.OpenProcess("Among Us");
+            if (b)
+            {
+                if (tickThread != null)
+                {
+                    tickThread.Interrupt();
+                    tickThread = null;
+                }
+                tickThread = new Thread(Tick);
+                this.UpdatedVectorDictionary.Clear();
+                this.S_PlayerControllList.Clear();
+                this.S_PlayerControllList = SearchPlayerInfoList();
+                tickThread.Start();
+            }
+        }
+        public void Tick()
+        {
+            
+            while(true)
+            {
+                UpdatePlayerList();
+                System.Threading.Thread.Sleep(10);
+            }
         }
 
-        public void UpdatePlayerPositions()
-        {
-            var players = SearchPlayerInfoList(); 
-        }
+
         public S_GameData ReadGameData()
         {
             try

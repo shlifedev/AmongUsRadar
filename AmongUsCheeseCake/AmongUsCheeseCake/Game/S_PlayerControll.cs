@@ -35,7 +35,7 @@ namespace AmongUsCheeseCake.Game
                 int _offset_vec2_position = 60;
                 int _offset_vec2_sizeOf = 8;
                 var netTransform = ((int)NetTransform + _offset_vec2_position).ToString("X");  
-                var vec2Data= Program.m.ReadBytes($"{netTransform}",_offset_vec2_sizeOf); // 주소로부터 8바이트 읽는다   
+                var vec2Data= CheatBase.Memory.ReadBytes($"{netTransform}",_offset_vec2_sizeOf); // 주소로부터 8바이트 읽는다   
            
                 if (vec2Data != null && vec2Data.Length != 0 )
                 { 
@@ -62,7 +62,7 @@ namespace AmongUsCheeseCake.Game
                 int _offset_vec2_position = 80;
                 int _offset_vec2_sizeOf = 8;
                 var netTransform = ((int)NetTransform + _offset_vec2_position).ToString("X");
-                var vec2Data= Program.m.ReadBytes($"{netTransform}",_offset_vec2_sizeOf); // 주소로부터 8바이트 읽는다  
+                var vec2Data= CheatBase.Memory.ReadBytes($"{netTransform}",_offset_vec2_sizeOf); // 주소로부터 8바이트 읽는다  
                 if (vec2Data != null && vec2Data.Length != 0)
                 {
                     var vec2 = Vector2.FromBytes(vec2Data); 
