@@ -66,7 +66,7 @@ namespace AmongUsCheeseCake
                         var currentVec = vec2;
                         if (originalData.x != currentVec.x)
                         {
-                            Console.WriteLine(x.PlayerId + "    " + currentVec.x + "," + currentVec.y);
+                            Console.WriteLine("Player ID : " + x.PlayerId + "    X " + currentVec.x + ", Y " + currentVec.y);
                         } 
                     } 
                     idx++;
@@ -107,20 +107,24 @@ namespace AmongUsCheeseCake
             Console.ForegroundColor = ConsoleColor.White;
             var open =  m.OpenProcess("Among us");
             S_PlayerControllList = SearchPlayerInfoList();
+
+
+            var gameDataOffset = FindGameDataInstance();
+            var bytes = m.ReadBytes(gameDataOffset, S_GameData.SizeOf());
+            var gameData = S_GameData.FromBytes(bytes);
+            Console.WriteLine(gameData.TotalTasks + "개의 미션중 " + gameData.CompletedTasks + " 개 완료함");
+
+
             if (open)
             {
                 while (true)
                 {
               
                     UpdatePlayerList();
-                    var gameDataOffset = FindGameDataInstance();
-                    var bytes = m.ReadBytes(gameDataOffset, S_GameData.SizeOf());
-                    var gameData = S_GameData.FromBytes(bytes);
-                    Console.WriteLine(gameData.TotalTasks + "개의 미션중 " + gameData.CompletedTasks + " 개 완료함");
-                     
+             
               
 
-
+                   
                 }
             }
 
