@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security.Policy;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,38 +21,43 @@ namespace AmongUsCheeseCake.Cheat
         public static Mem Memory = new Mem();
 
 
-        /// <summary>
-        /// 플레이어 위치정보
-        /// </summary>
-        public List<CachedPlayerControllInfo> playersPositions = new List<CachedPlayerControllInfo>();  
 
 
         private string m_cached_gameDataOffset = null;
 
-        private List<S_PlayerControll> S_PlayerControllList = new List<S_PlayerControll>();
+        private List<S_PlayerControll> SearchedPlayerList = new List<S_PlayerControll>();
+        public List<S_PlayerControll> RealPlayerInstance = new List<S_PlayerControll>();
+        private Dictionary<int, S_PlayerControll> RealPlayerInstancePID = new Dictionary<int, S_PlayerControll>(); 
         private Dictionary<int, Vector2> UpdatedVectorDictionary = new Dictionary<int, Vector2>();
         private Thread tickThread = null;
+        private Thread radarThread = null;
+
+
+
+
         List<S_PlayerControll> SearchPlayerInfoList()
         {
             List<S_PlayerControll> list = new List<S_PlayerControll>();
             var result = Memory.AoBScan(PlayerControllPattern, true, true);
             result.Wait();
-            var results =    result.Result; 
+            var results =    result.Result;
             foreach (var x in results)
             {
                 var bytes = Memory.ReadBytes(x.GetAddress(), S_PlayerControll.SizeOf());
                 var playerControll = S_PlayerControll.FromBytes(bytes);
-                list.Add(playerControll); 
+                list.Add(playerControll);
             }
             return list;
         }
 
 
-         
+        /// <summary>
+        /// 2회이상 실행해야 찾을 수 있음
+        /// </summary>
         void UpdatePlayerList()
         {
             int idx = 0;
-            foreach (var x in S_PlayerControllList)
+            foreach (var x in SearchedPlayerList)
             {
                 var vec2 = x.GetSyncPosition();
                 if (vec2.IsZero() == false)
@@ -65,8 +71,12 @@ namespace AmongUsCheeseCake.Cheat
                         var originalData = UpdatedVectorDictionary[idx];
                         var currentVec = vec2;
                         if (originalData.x != currentVec.x || originalData.y != currentVec.y)
-                        {
-                            Console.WriteLine("Player ID : " + x.PlayerId + "    X " + currentVec.x + ", Y " + currentVec.y + ",  " + x.NetTransform);
+                        { 
+                            if (RealPlayerInstancePID.ContainsKey(x.PlayerId) == false)
+                            {
+                                RealPlayerInstance.Add(x);
+                                RealPlayerInstancePID.Add(x.PlayerId, x);
+                            }
                         }
                     }
                 }
@@ -96,10 +106,10 @@ namespace AmongUsCheeseCake.Cheat
                     offset = x.GetAddress();
             }
             this.m_cached_gameDataOffset = offset;
-        } 
-    
+        }
+
         public void Init()
-        {
+        { 
             var b = Memory.OpenProcess("Among Us");
             if (b)
             {
@@ -108,21 +118,63 @@ namespace AmongUsCheeseCake.Cheat
                     tickThread.Interrupt();
                     tickThread = null;
                 }
+                if (radarThread != null)
+                {
+                    radarThread.Interrupt();
+                    radarThread = null;
+                }
+
+
+
+
                 tickThread = new Thread(Tick);
+                radarThread = new Thread(Radar);
                 this.UpdatedVectorDictionary.Clear();
-                this.S_PlayerControllList.Clear();
-                this.S_PlayerControllList = SearchPlayerInfoList();
+                this.RealPlayerInstance.Clear();
+                this.RealPlayerInstancePID.Clear();
+                this.SearchedPlayerList.Clear();
+                this.SearchedPlayerList = SearchPlayerInfoList();
+
+ 
+
+
+
                 tickThread.Start();
+                radarThread.Start();
             }
+        }
+
+        public void UpdatePlayerPosition()
+        {
+            foreach (var x in RealPlayerInstance)
+            {
+                var currentVec = x.GetSyncPosition();
+                Console.WriteLine("Player ID : " + x.PlayerId + "    X " + currentVec.x + ", Y " + currentVec.y + ",  " + x.NetTransform);
+            }
+        }
+
+
+        
+        public void ShowRadar()
+        {
+
         }
         public void Tick()
         {
-            
-            while(true)
+            Console.WriteLine("Tick Thread!");
+            while (true)
             {
                 UpdatePlayerList();
+                UpdatePlayerPosition();
                 System.Threading.Thread.Sleep(10);
             }
+        }
+        public void Radar()
+        {
+            Console.WriteLine("Radar Thread!");
+            RadarOverlay rd = new RadarOverlay();
+            rd.cb = this;
+            rd.Run();
         }
 
 

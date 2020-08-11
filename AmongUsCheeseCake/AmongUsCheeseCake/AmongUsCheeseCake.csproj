@@ -67,6 +67,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cheat\CachedPlayerControllInfo.cs" />
+    <Compile Include="Cheat\Radar.cs" />
     <Compile Include="Cheat\Utilis.cs" />
     <Compile Include="Game\S_GameData.cs" />
     <Compile Include="Game\S_InnerNetObject.cs" />
