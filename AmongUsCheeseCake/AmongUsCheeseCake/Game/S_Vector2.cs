@@ -13,6 +13,8 @@ namespace AmongUsCheeseCake.Game
     public struct S_Vector2
     {
         public float x,y;
+
+
         public static S_Vector2 FromBytes(byte[] bytes)
         {
             GCHandle gcHandle = GCHandle.Alloc(bytes, GCHandleType.Pinned); 
