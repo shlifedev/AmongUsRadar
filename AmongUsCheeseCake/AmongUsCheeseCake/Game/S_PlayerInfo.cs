@@ -18,10 +18,22 @@ namespace AmongUsCheeseCake.Game
             gcHandle.Free();
             return data;
         }
+        public static List<S_PlayerInfo> FromBytesList(byte[] bytes)
+        {
+            GCHandle gcHandle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
+            var data = (List<S_PlayerInfo>)Marshal.PtrToStructure(gcHandle.AddrOfPinnedObject(), typeof(List<S_PlayerInfo>));
+            gcHandle.Free();
+            return data;
+        }
 
         public static int SizeOf()
         {
             var size = Marshal.SizeOf(typeof(S_PlayerInfo)); ;
+            return size;
+        }
+        public static int SizeOfList()
+        {
+            var size = Marshal.SizeOf(typeof(List<S_PlayerInfo>)); ;
             return size;
         }
         public readonly byte PlayerId;

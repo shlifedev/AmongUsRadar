@@ -18,7 +18,7 @@ namespace AmongUsCheeseCake.Game
             gcHandle.Free();
             return data;
         }
-
+  
         public static int SizeOf()
         {
             var size = Marshal.SizeOf(typeof(S_PlayerControll));;

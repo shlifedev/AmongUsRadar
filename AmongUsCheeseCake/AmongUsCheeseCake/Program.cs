@@ -17,117 +17,62 @@ namespace AmongUsCheeseCake
     class Program
     {
         /*Memory Ref https://github.com/shlifedev/memory.dll*/
-        static public Mem m = new Mem(); 
-        public static List<UIntPtr> datas = new List<UIntPtr>() {
-            new UIntPtr(0x06854960),
-            new UIntPtr(0x06854A00),
-            new UIntPtr(0x06854AA0),
-            new UIntPtr(0x06854B40),
-            new UIntPtr(0x06854BE0)
-        };
+        static public Mem m = new Mem();
 
-        class playerData
-        {
-            public S_PlayerControll _instance;
-            public S_Vector2 vec2;
-            public string hex;
-            public int size = 0;
-            public void ReadMemory()
-            {  
-                var data          = m.ReadBytes($"{hex}", size); 
-                var instance = S_PlayerControll.FromBytes(data);
-                this._instance = instance;
-            }
-            public void ReadPos()
-            {
-                int _offset_vec2_position = 80;
-                int _offset_vec2_sizeOf = 8;
+        static string GetAddress(long value) { return value.ToString("X"); }
+        static string GetAddress(int value) { return value.ToString("X"); }
+        static string GetAddress(uint value) { return value.ToString("X"); }
 
-                var netTransform = ((int)_instance.NetTransform + _offset_vec2_position).ToString("X");
-                var vec2Data= m.ReadBytes($"{netTransform}",_offset_vec2_sizeOf); // 주소로부터 8바이트 읽는다   
-                this.vec2 = S_Vector2.FromBytes(vec2Data);
-            }
-        } 
-        static List<playerData> playerControllList = new List<playerData>(); 
-        static void log(string tag, Object log)
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.Write($"[{tag}] ");
-            Console.Write($"{log}\n");
-             
-        }
-   
-        static void readPlayerList(string base_offset, int player_count)
-        {
-            var size = S_PlayerControll.SizeOf() + 4;
-            log("player struct size", $"{size} byte ");
-            for (int i = 0; i < player_count; i++)
-            {
-                var nextOffset    = int.Parse(base_offset, System.Globalization.NumberStyles.HexNumber);
-                nextOffset = nextOffset + (size * i);
-                var nextOffsetHex = nextOffset.ToString("X");
-                var pd = new playerData();
-                pd.hex = nextOffsetHex;
-                pd.size = size;
-                pd.ReadMemory();
-                playerControllList.Add(pd);
-            }
-        }
+        static string GameDataPattern = "08 77 CA 06 ?? ?? ?? ??"; 
 
-   
-        static void updatePos()
+
+        /// <summary>
+        /// 데이터를 찾는 비용이 크므로 1회성 실행한다.
+        /// </summary>
+        /// <returns></returns>
+        static String FindGameDataInstance()
         {
-           
-            string log = null;
-            foreach(var player in playerControllList)
-            { 
-                player.ReadMemory(); 
-                player.ReadPos();
-                log += $"Player{player._instance.netId} => x{player.vec2.x} y{player.vec2.y}\n";
-            } 
-            Console.WriteLine(log);
-        }
-        
-        static void ReadTest()
-        {
-            if (m.OpenProcess("Among Us"))
+            string offset = null; 
+            var result = m.AoBScan(GameDataPattern, true, true);
+            result.Wait();
+            var results =    result.Result;
+            Console.WriteLine("instanced gamedata offset count : => " + results.Count());
+            foreach (var x in results)
             {
-                Console.WriteLine(S_PlayerControll.SizeOf());
-                readPlayerList("073D4D20", 1);
-                while (true)
+                var bytes = m.ReadBytes(GetAddress(x), S_GameData.SizeOf());
+                var gameData = S_GameData.FromBytes(bytes); 
+                // OWNER ID가 -2이고, NetId가 4294967295가 아닌 객체는 실제 인스턴스이다.
+                // 4294967295(uint의 max값)은, 이미 인스턴스가 해제된 가비지값을 가리킴
+                if (gameData.OwnerId == -2 && gameData.NetId != 4294967295)
                 {
-                    updatePos();
-                    Thread.Sleep(20);
-                    Console.Clear();
-                }
-
-            }
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("Found Real Gamedata Instance!");
+                    Console.ForegroundColor = ConsoleColor.White;
+                    offset = GetAddress(x);
+                } 
+            } 
+            return offset;
         }
-         static void Readtest2(string dummyInstanceOffset)
-        {
-            Console.WriteLine(S_GameData.SizeOf());
 
-            // 쓰레기 힙에 더미로 생성된 S_GameData정보
-            var dummyInstanceByte = m.ReadBytes(dummyInstanceOffset, S_GameData.SizeOf());
-            var data = S_GameData.FromBytes(dummyInstanceByte); 
-            var singletonHex = data.Instance_Dummy.ToString("X"); 
-          
-            log("GameData Singleton Hex", singletonHex); 
-           
-            // GameData의 실제 싱글톤
-            var singletonHexDummy = int.Parse(singletonHex, System.Globalization.NumberStyles.HexNumber) - 8;
-            var realInstanceHex = singletonHexDummy.ToString("X");
-            log("GameData Singleton realInstanceHex", realInstanceHex); 
 
-            var realInstanceByte = m.ReadBytes(realInstanceHex, S_GameData.SizeOf());
-
-        }
         static void Main(string[] args)
         { 
-            var c =  m.OpenProcess("Among us");
-            //ReadTest();
-            Readtest2("044B6860"); 
-            System.Threading.Thread.Sleep(1000000);
+                Console.ForegroundColor = ConsoleColor.White;
+                var open =  m.OpenProcess("Among us");
+                if (open)
+                {
+                    while (true)
+                    {
+                        var gameDataOffset = FindGameDataInstance();
+                        var bytes = m.ReadBytes(gameDataOffset, S_GameData.SizeOf());
+                        var gameData = S_GameData.FromBytes(bytes);   
+                        Console.WriteLine(gameData.TotalTasks + "개의 미션중 " + gameData.CompletedTasks + " 개 완료함"); 
+                        Console.Write(gameData.AllPlayers.ToUInt32().ToString("X"));
+                    }
+                }
+                 
+                System.Threading.Thread.Sleep(100000000); 
         }
+
     }
 }
