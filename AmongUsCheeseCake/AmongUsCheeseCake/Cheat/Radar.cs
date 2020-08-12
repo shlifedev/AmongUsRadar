@@ -16,7 +16,7 @@ public class RadarOverlay : IDisposable
     private readonly Dictionary<string, Font> _fonts;
     private readonly Dictionary<string, Image> _images;
 
-    public float map_size = 200;
+    public float map_size = 50;
     public float overlaySize = 350;
     public RadarOverlay()
     {
@@ -67,8 +67,9 @@ public class RadarOverlay : IDisposable
             return;
 
         _fonts["arial"] = gfx.CreateFont("Arial", 12);
-        _fonts["consolas"] = gfx.CreateFont("Consolas", 16); 
-   
+        _fonts["arial_small"] = gfx.CreateFont("Arial", 10);
+        _fonts["consolas"] = gfx.CreateFont("Consolas", 16);
+
     }
 
     private void _window_DestroyGraphics(object sender, DestroyGraphicsEventArgs e)
@@ -88,10 +89,12 @@ public class RadarOverlay : IDisposable
         foreach (var x in cb.RealPlayerInstance)
         {
             var pos = Vector2.Zero;
-            var playerBrush = x.PlayerId == cb.localPID ? _brushes["green"] : _brushes["red"];
-            if(x.PlayerId == cb.localPID)
+            var playerBrush = _brushes["red"]; 
+            var MyPos = x.GetMyPosition();
+            if (MyPos.IsZero() == false)
             {
                 pos = x.GetMyPosition();
+                playerBrush= _brushes["green"];
             }
             else
             {
@@ -101,7 +104,8 @@ public class RadarOverlay : IDisposable
             float overlayYPer = pos.y / map_size;  
             var overlayX = (overlaySize/2) + (overlaySize * (pos.x / map_size));
             var overlayY = (overlaySize/2) - (overlaySize * (pos.y / map_size)); 
-            gfx.FillRectangle(playerBrush, overlayX - 2, overlayY - 2, overlayX + 2, overlayY + 2);
+            gfx.FillCircle(playerBrush, overlayX - 2, overlayY - 2, 2);
+            gfx.DrawText(_fonts["arial_small"], _brushes["white"], new Point(overlayX, overlayY), x.PlayerId.ToString()); 
         }
     }
  

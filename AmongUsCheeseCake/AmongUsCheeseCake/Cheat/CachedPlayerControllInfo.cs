@@ -12,7 +12,11 @@ namespace AmongUsCheeseCake.Cheat
 {
     public class CachedPlayerControllInfo
     {
-        public int id;
+        public string offset;
         public S_PlayerControll Instance; 
+        public void ReadMemory()
+        {
+
+        }
     }
 }

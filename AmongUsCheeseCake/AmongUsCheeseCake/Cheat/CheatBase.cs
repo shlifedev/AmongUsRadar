@@ -29,7 +29,7 @@ namespace AmongUsCheeseCake.Cheat
         public List<S_PlayerControll> RealPlayerInstance = new List<S_PlayerControll>();
         private Dictionary<int, S_PlayerControll> RealPlayerInstancePID = new Dictionary<int, S_PlayerControll>();
         private Dictionary<int, Vector2> UpdatedVectorDictionary = new Dictionary<int, Vector2>();
-        public int localPID = -999;
+        public int localNetworkID = 483328960;
 
         private Thread tickThread = null;
         private Thread radarThread = null;
@@ -145,8 +145,7 @@ namespace AmongUsCheeseCake.Cheat
 
 
  
-
-                localPID = -999;
+                 
                 tickThread = new Thread(Tick);
                 radarThread = new Thread(Radar);
                 this.UpdatedVectorDictionary.Clear();
@@ -161,19 +160,24 @@ namespace AmongUsCheeseCake.Cheat
             }
         }
 
+        /// <summary>
+        /// 로깅 테스트
+        /// </summary>
         public void UpdatePlayerPosition()
         {
             foreach (var x in RealPlayerInstance)
             {
-                if (localPID == x.PlayerId)
+                var test = x.GetMyPosition();
+                if (test.IsZero() == false)
                 {
                     var currentVec = x.GetMyPosition();
                     Console.WriteLine("My Player ID : " + x.PlayerId + "    X " + currentVec.x + ", Y " + currentVec.y + ",  " + x.NetTransform);
                 }
                 else
                 {
-                    var currentVec = x.GetSyncPosition();
+                    var currentVec = x.GetSyncPosition(); 
                     Console.WriteLine($"Player ID : {x.PlayerId}  Net ID : {x.netId}  Owner ID : {x.OwnerId}    ({currentVec.x.ToString("0.0")},{currentVec.y.ToString("0.0")})");
+                    Console.WriteLine($"( ㄴ{test.x.ToString("0.0")},{test.y.ToString("0.0")})");
                 }
 
             }
