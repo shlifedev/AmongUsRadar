@@ -17,4 +17,9 @@
  # Soon
   - 2D ESP
   - Rage Mode
+  - Filter & Show Dead Player
+  - Filter & Show Imposter
+  
+  
+  
  
