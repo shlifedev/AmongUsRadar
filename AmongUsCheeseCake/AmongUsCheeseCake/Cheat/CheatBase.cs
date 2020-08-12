@@ -3,9 +3,11 @@ using AmongUsCheeseCake.Game;
 using Memory;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Security.Policy;
 using System.Text;
 using System.Threading;
@@ -15,6 +17,19 @@ namespace AmongUsCheeseCake.Cheat
 {
     public class CheatBase
     {
+        public struct Rect
+        {
+            public int Left { get; set; }
+            public int Top { get; set; }
+            public int Right { get; set; }
+            public int Bottom { get; set; }
+        }
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        public static extern IntPtr FindWindow(string strClassName, string strWindowName);
+
+        [DllImport("user32.dll")]
+        public static extern bool GetWindowRect(IntPtr hwnd, ref Rect rectangle);
+
         static string PlayerControllPattern = "B0 45 D4 0F ?? ?? ?? ??";
         static string GameDataPattern = "A8 A4 B0 06 ?? ?? ?? ??";
 
@@ -140,7 +155,7 @@ namespace AmongUsCheeseCake.Cheat
 
                 
                 tickThread.Start();
-                if(radarThread.ThreadState == ThreadState.Unstarted)
+                if(radarThread.ThreadState == System.Threading.ThreadState.Unstarted)
                    radarThread.Start();
             }
         }
@@ -178,8 +193,23 @@ namespace AmongUsCheeseCake.Cheat
             Console.WriteLine("Start Tick Thread!"); 
             SearchedPlayerList = SearchPlayersWithoutMine();
             FindAllRealPlayerInstance(); 
+
+            var proc = Process.GetProcessesByName("Among Us");
+            bool test_rect = false;
+            if(proc != null)
+            { 
+             
+            }
             while (true)
             {
+                if (test_rect)
+                {
+                    Process lol = proc[0];
+                    IntPtr ptr = lol.MainWindowHandle;
+                    Rect rect = new Rect();
+                    GetWindowRect(ptr, ref rect);
+                    radar.SetWindowPos(rect.Left + 10, rect.Top + 30);
+                }
                 UpdatePlayerPosition();
                 System.Threading.Thread.Sleep(10); 
             }

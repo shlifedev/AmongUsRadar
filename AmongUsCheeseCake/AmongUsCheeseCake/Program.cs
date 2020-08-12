@@ -44,6 +44,12 @@ namespace AmongUsCheeseCake
                     cb.radar.SetWindowSize(size, size);
                     cb.radar.overlaySize = size;
                 }
+                if (command.ToLower().Contains("center"))
+                {
+                    var x = command.Split(' ');
+                    var size = int.Parse(x[1]); 
+                    cb.radar.center = size;
+                }
             }
 
             System.Threading.Thread.Sleep(100000000);

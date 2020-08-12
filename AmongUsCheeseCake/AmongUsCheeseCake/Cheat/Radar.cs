@@ -44,7 +44,11 @@ public class RadarOverlay : IDisposable
     }
     public void SetWindowSize(int x, int y)
     {
-        _window.Resize(x,y);
+        _window.Resize(x, y);
+    }
+    public void SetWindowPos(int x, int y)
+    {
+        _window.Move(x, y);
     }
     private void _window_SetupGraphics(object sender, SetupGraphicsEventArgs e)
     {
@@ -84,6 +88,7 @@ public class RadarOverlay : IDisposable
     }
 
 
+    public float center = 0;
      
     private void _window_DrawGraphics(object sender, DrawGraphicsEventArgs e)
     { 
@@ -107,10 +112,10 @@ public class RadarOverlay : IDisposable
             {
                 pos = x.Instance.GetMyPosition();
             }
-            float overlayXPer = pos.x / map_size;
-            float overlayYPer = pos.y / map_size;  
-            var overlayX = (overlaySize/2) + (overlaySize * (pos.x / map_size));
-            var overlayY = (overlaySize/2) - (overlaySize * (pos.y / map_size));  
+            float overlayXPer = (pos.x +center) / map_size; 
+            float overlayYPer = (pos.y +center) / map_size;  
+            var overlayX = (overlaySize/2) + (overlaySize * ((pos.x +center) / map_size));
+            var overlayY = (overlaySize/2) - (overlaySize * ((pos.y -center) / map_size));  
 
             x.ReadMemory();
             if(x.isOther && x.isImposter)
