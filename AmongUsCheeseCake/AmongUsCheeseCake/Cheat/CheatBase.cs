@@ -15,7 +15,7 @@ namespace AmongUsCheeseCake.Cheat
 {
     public class CheatBase
     {
-        static string PlayerControllPattern = "C0 35 69 10 ?? ?? ?? ??";
+        static string PlayerControllPattern = "B0 45 D4 0F ?? ?? ?? ??";
         static string GameDataPattern = "A8 A4 B0 06 ?? ?? ?? ??";
 
         public static Mem Memory = new Mem();
@@ -25,7 +25,7 @@ namespace AmongUsCheeseCake.Cheat
 
         private string m_cached_gameDataOffset = null;
 
-        private List<S_PlayerControll> SearchedPlayerList = new List<S_PlayerControll>();
+        private List<S_PlayerControll> SearchedPlayerList = new List<S_PlayerControll>();  
         public List<S_PlayerControll> RealPlayerInstance = new List<S_PlayerControll>();
         private Dictionary<int, S_PlayerControll> RealPlayerInstancePID = new Dictionary<int, S_PlayerControll>();
         private Dictionary<int, Vector2> UpdatedVectorDictionary = new Dictionary<int, Vector2>();
@@ -37,8 +37,9 @@ namespace AmongUsCheeseCake.Cheat
 
 
 
-        List<S_PlayerControll> SearchPlayerInfoList()
+        List<S_PlayerControll> SearchPlayersWithoutMine()
         {
+
             List<S_PlayerControll> list = new List<S_PlayerControll>();
             var result = Memory.AoBScan(PlayerControllPattern, true, true);
             result.Wait();
@@ -47,10 +48,37 @@ namespace AmongUsCheeseCake.Cheat
             {
                 var bytes = Memory.ReadBytes(x.GetAddress(), S_PlayerControll.SizeOf());
                 var playerControll = S_PlayerControll.FromBytes(bytes);
-                list.Add(playerControll);
+                // 모든 플레이어의 공통 owner id
+                if (playerControll.OwnerId == 257 && playerControll.netId != 0)
+                {
+                    Console.WriteLine("add Players :: " + playerControll.PlayerId);
+                    list.Add(playerControll);
+                }
+                else
+                {
+
+                }
             }
             return list;
         }
+
+
+        List<S_PlayerControll> SearchAllPlayerInstance()
+        {
+
+            List<S_PlayerControll> list = new List<S_PlayerControll>();
+            var result = Memory.AoBScan(PlayerControllPattern, true, true);
+            result.Wait();
+            var results =    result.Result;
+            foreach (var x in results)
+            {
+                var bytes = Memory.ReadBytes(x.GetAddress(), S_PlayerControll.SizeOf());
+                var playerControll = S_PlayerControll.FromBytes(bytes); 
+                list.Add(playerControll); 
+            }
+            return list;
+        }
+
 
 
         /// <summary>
@@ -58,37 +86,11 @@ namespace AmongUsCheeseCake.Cheat
         /// </summary>
         void UpdatePlayerList()
         {
-            int idx = 0;
+            RealPlayerInstance.Clear();
             foreach (var x in SearchedPlayerList)
-            {  
-                var vec2 = x.GetSyncPosition();
-                if ((vec2.x <= 300 && vec2.y <= 300))
-                { 
-                    if (vec2.IsZero() == false && vec2.IsGarbage() == false)
-                    {
-                        if (UpdatedVectorDictionary.ContainsKey(idx) == false)
-                        {
-                            UpdatedVectorDictionary.Add(idx, vec2);
-                        }
-                        else
-                        {
-                            var originalData = UpdatedVectorDictionary[idx];
-                            var currentVec = vec2;
-                            if (originalData.x != currentVec.x || originalData.y != currentVec.y)
-                            {
-                                if (x.OwnerId == 257)
-                                {
-                                    if (RealPlayerInstancePID.ContainsKey(x.PlayerId) == false)
-                                    {
-                                        RealPlayerInstance.Add(x);
-                                        RealPlayerInstancePID.Add(x.PlayerId, x);
-                                    }
-                                }
-                            }
-                        }
-                    }  
-                }
-                idx++;
+            {
+                var vec2 = x.GetSyncPosition(); 
+                RealPlayerInstance.Add(x);  
             }
         }
 
@@ -97,33 +99,7 @@ namespace AmongUsCheeseCake.Cheat
         /// </summary>
         void UpdateMyPlayer()
         {
-            int idx = 2000;
-            foreach (var x in SearchedPlayerList)
-            {
-                var vec2 = x.GetMyPosition();  
-                if (vec2.IsZero() == false)
-                {
-                    if (UpdatedVectorDictionary.ContainsKey(idx) == false)
-                    { 
-                        UpdatedVectorDictionary.Add(idx, vec2);
-                    }
-                    else
-                    {
-                        var originalData = UpdatedVectorDictionary[idx];
-                        var currentVec = vec2;
-                        if (originalData.x != currentVec.x)
-                        {
-                            if (RealPlayerInstancePID.ContainsKey(x.PlayerId) == false)
-                            { 
-                                localPID = x.PlayerId;
-                                RealPlayerInstance.Add(x);
-                                RealPlayerInstancePID.Add(x.PlayerId, x); 
-                            } 
-                        }
-                    }
-                }
-                idx++;
-            }
+            
         }
 
 
@@ -152,7 +128,7 @@ namespace AmongUsCheeseCake.Cheat
         }
 
         public void Init()
-        { 
+        {
             var b = Memory.OpenProcess("Among Us");
             if (b)
             {
@@ -168,7 +144,7 @@ namespace AmongUsCheeseCake.Cheat
                 }
 
 
-
+ 
 
                 localPID = -999;
                 tickThread = new Thread(Tick);
@@ -176,9 +152,7 @@ namespace AmongUsCheeseCake.Cheat
                 this.UpdatedVectorDictionary.Clear();
                 this.RealPlayerInstance.Clear();
                 this.RealPlayerInstancePID.Clear();
-                this.SearchedPlayerList.Clear();
-                this.SearchedPlayerList = SearchPlayerInfoList(); 
-
+                this.SearchedPlayerList.Clear(); 
 
 
 
@@ -190,36 +164,42 @@ namespace AmongUsCheeseCake.Cheat
         public void UpdatePlayerPosition()
         {
             foreach (var x in RealPlayerInstance)
-            { 
+            {
                 if (localPID == x.PlayerId)
                 {
                     var currentVec = x.GetMyPosition();
                     Console.WriteLine("My Player ID : " + x.PlayerId + "    X " + currentVec.x + ", Y " + currentVec.y + ",  " + x.NetTransform);
-                } 
+                }
                 else
                 {
                     var currentVec = x.GetSyncPosition();
                     Console.WriteLine($"Player ID : {x.PlayerId}  Net ID : {x.netId}  Owner ID : {x.OwnerId}    ({currentVec.x.ToString("0.0")},{currentVec.y.ToString("0.0")})");
                 }
-             
+
             }
         }
 
 
-        
+
         public void ShowRadar()
         {
 
         }
         public void Tick()
-        {
+        { 
             Console.WriteLine("Tick Thread!");
+
+            //플레이어 찾기
+            SearchedPlayerList = SearchPlayersWithoutMine();
+            UpdatePlayerList();
+
+
             while (true)
             {
-                UpdatePlayerList(); 
+            
                 UpdateMyPlayer();
-                UpdatePlayerPosition(); 
-                System.Threading.Thread.Sleep(10);
+                UpdatePlayerPosition();
+                System.Threading.Thread.Sleep(10); 
             }
         }
         public void Radar()
