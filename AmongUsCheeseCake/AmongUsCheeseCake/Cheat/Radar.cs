@@ -89,17 +89,9 @@ public class RadarOverlay : IDisposable
         foreach (var x in cb.RealPlayerInstance)
         {
             var pos = Vector2.Zero;
-            var playerBrush = _brushes["red"]; 
-            var MyPos = x.GetMyPosition();
-            if (MyPos.IsZero() == false)
-            {
-                pos = x.GetMyPosition();
-                playerBrush= _brushes["green"];
-            }
-            else
-            {
+            var playerBrush = _brushes["red"];   
                 pos = x.GetSyncPosition();
-            }
+         
             float overlayXPer = pos.x / map_size;
             float overlayYPer = pos.y / map_size;  
             var overlayX = (overlaySize/2) + (overlaySize * (pos.x / map_size));

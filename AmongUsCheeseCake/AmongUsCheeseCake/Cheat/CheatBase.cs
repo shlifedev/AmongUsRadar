@@ -79,12 +79,8 @@ namespace AmongUsCheeseCake.Cheat
             return list;
         }
 
-
-
-        /// <summary>
-        /// 2회이상 실행해야 찾을 수 있음
-        /// </summary>
-        void UpdatePlayerList()
+         
+        void FindAllRealPlayerInstance()
         {
             RealPlayerInstance.Clear();
             foreach (var x in SearchedPlayerList)
@@ -93,15 +89,7 @@ namespace AmongUsCheeseCake.Cheat
                 RealPlayerInstance.Add(x);  
             }
         }
-
-        /// <summary>
-        /// 2회이상 실행해야 찾을 수 있음
-        /// </summary>
-        void UpdateMyPlayer()
-        {
-            
-        }
-
+         
 
 
 
@@ -171,7 +159,8 @@ namespace AmongUsCheeseCake.Cheat
                 if (test.IsZero() == false)
                 {
                     var currentVec = x.GetMyPosition();
-                    Console.WriteLine("My Player ID : " + x.PlayerId + "    X " + currentVec.x + ", Y " + currentVec.y + ",  " + x.NetTransform);
+                    Console.WriteLine("My Player ID : " + x.PlayerId + "    X " + currentVec.x + ", Y " + currentVec.y + ",  " + x.DirtyBits);
+
                 }
                 else
                 {
@@ -195,13 +184,11 @@ namespace AmongUsCheeseCake.Cheat
 
             //플레이어 찾기
             SearchedPlayerList = SearchPlayersWithoutMine();
-            UpdatePlayerList();
+            FindAllRealPlayerInstance();
 
 
             while (true)
-            {
-            
-                UpdateMyPlayer();
+            { 
                 UpdatePlayerPosition();
                 System.Threading.Thread.Sleep(10); 
             }
