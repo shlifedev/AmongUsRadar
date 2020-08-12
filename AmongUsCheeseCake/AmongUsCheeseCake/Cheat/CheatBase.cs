@@ -60,9 +60,9 @@ namespace AmongUsCheeseCake.Cheat
         {
             int idx = 0;
             foreach (var x in SearchedPlayerList)
-            {
+            {  
                 var vec2 = x.GetSyncPosition();
-                if (vec2.x <= 300 && vec2.y <= 300)
+                if ((vec2.x <= 300 && vec2.y <= 300))
                 { 
                     if (vec2.IsZero() == false && vec2.IsGarbage() == false)
                     {
@@ -75,16 +75,20 @@ namespace AmongUsCheeseCake.Cheat
                             var originalData = UpdatedVectorDictionary[idx];
                             var currentVec = vec2;
                             if (originalData.x != currentVec.x || originalData.y != currentVec.y)
-                            { 
-                                if (RealPlayerInstancePID.ContainsKey(x.PlayerId) == false)
+                            {
+                                if (x.OwnerId == 257)
                                 {
-                                    RealPlayerInstance.Add(x);
-                                    RealPlayerInstancePID.Add(x.PlayerId, x);
+                                    if (RealPlayerInstancePID.ContainsKey(x.PlayerId) == false)
+                                    {
+                                        RealPlayerInstance.Add(x);
+                                        RealPlayerInstancePID.Add(x.PlayerId, x);
+                                    }
                                 }
                             }
                         }
                     }  
-                } 
+                }
+                idx++;
             }
         }
 
@@ -107,7 +111,7 @@ namespace AmongUsCheeseCake.Cheat
                     {
                         var originalData = UpdatedVectorDictionary[idx];
                         var currentVec = vec2;
-                        if (originalData.x != currentVec.x || originalData.y != currentVec.y)
+                        if (originalData.x != currentVec.x)
                         {
                             if (RealPlayerInstancePID.ContainsKey(x.PlayerId) == false)
                             { 
@@ -195,7 +199,7 @@ namespace AmongUsCheeseCake.Cheat
                 else
                 {
                     var currentVec = x.GetSyncPosition();
-                    Console.WriteLine("Player ID : " + x.PlayerId + "    X " + currentVec.x + ", Y " + currentVec.y + ",  " + x.NetTransform);
+                    Console.WriteLine($"Player ID : {x.PlayerId}  Net ID : {x.netId}  Owner ID : {x.OwnerId}    ({currentVec.x.ToString("0.0")},{currentVec.y.ToString("0.0")})");
                 }
              
             }

@@ -16,7 +16,7 @@ public class RadarOverlay : IDisposable
     private readonly Dictionary<string, Font> _fonts;
     private readonly Dictionary<string, Image> _images;
 
-    public float map_size = 50;
+    public float map_size = 200;
     public float overlaySize = 350;
     public RadarOverlay()
     {
