@@ -16,5 +16,11 @@
  
  # Soon
   - 2D ESP
+  - 2D Radar Map(Image)
   - Rage Mode
+  - Filter & Show Dead Player
+  - Filter & Show Imposter
+  
+  
+  
  
