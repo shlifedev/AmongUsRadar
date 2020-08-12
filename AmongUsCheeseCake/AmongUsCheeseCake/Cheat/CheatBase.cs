@@ -25,10 +25,8 @@ namespace AmongUsCheeseCake.Cheat
 
         private string m_cached_gameDataOffset = null;
 
-        private List<S_PlayerControll> SearchedPlayerList = new List<S_PlayerControll>();  
-        public List<S_PlayerControll> RealPlayerInstance = new List<S_PlayerControll>();
-        private Dictionary<int, S_PlayerControll> RealPlayerInstancePID = new Dictionary<int, S_PlayerControll>();
-        private Dictionary<int, Vector2> UpdatedVectorDictionary = new Dictionary<int, Vector2>();
+        private List<CachedPlayerControllInfo> SearchedPlayerList = new List<CachedPlayerControllInfo>();  
+        public List<CachedPlayerControllInfo> RealPlayerInstance = new List<CachedPlayerControllInfo>(); 
         public int localNetworkID = 483328960;
 
         private Thread tickThread = null;
@@ -37,10 +35,10 @@ namespace AmongUsCheeseCake.Cheat
 
 
 
-        List<S_PlayerControll> SearchPlayersWithoutMine()
+        List<CachedPlayerControllInfo> SearchPlayersWithoutMine()
         {
 
-            List<S_PlayerControll> list = new List<S_PlayerControll>();
+            List<CachedPlayerControllInfo> list = new List<CachedPlayerControllInfo>();
             var result = Memory.AoBScan(PlayerControllPattern, true, true);
             result.Wait();
             var results =    result.Result;
@@ -52,7 +50,10 @@ namespace AmongUsCheeseCake.Cheat
                 if (playerControll.OwnerId == 257 && playerControll.netId != 0)
                 {
                     Console.WriteLine("add Players :: " + playerControll.PlayerId);
-                    list.Add(playerControll);
+                    list.Add(new CachedPlayerControllInfo() {
+                        Instance = playerControll,
+                        offset = x.GetAddress()
+                    });
                 }
                 else
                 {
@@ -85,8 +86,8 @@ namespace AmongUsCheeseCake.Cheat
             RealPlayerInstance.Clear();
             foreach (var x in SearchedPlayerList)
             {
-                var vec2 = x.GetSyncPosition(); 
-                RealPlayerInstance.Add(x);  
+                var vec2 = x.Instance.GetSyncPosition(); 
+                RealPlayerInstance.Add(x);
             }
         }
          
@@ -135,10 +136,8 @@ namespace AmongUsCheeseCake.Cheat
  
                  
                 tickThread = new Thread(Tick);
-                radarThread = new Thread(Radar);
-                this.UpdatedVectorDictionary.Clear();
-                this.RealPlayerInstance.Clear();
-                this.RealPlayerInstancePID.Clear();
+                radarThread = new Thread(Radar); 
+                this.RealPlayerInstance.Clear(); 
                 this.SearchedPlayerList.Clear(); 
 
 
@@ -155,20 +154,22 @@ namespace AmongUsCheeseCake.Cheat
         {
             foreach (var x in RealPlayerInstance)
             {
-                var test = x.GetMyPosition();
-                if (test.IsZero() == false)
-                {
-                    var currentVec = x.GetMyPosition();
-                    Console.WriteLine("My Player ID : " + x.PlayerId + "    X " + currentVec.x + ", Y " + currentVec.y + ",  " + x.DirtyBits);
-
-                }
-                else
-                {
-                    var currentVec = x.GetSyncPosition(); 
-                    Console.WriteLine($"Player ID : {x.PlayerId}  Net ID : {x.netId}  Owner ID : {x.OwnerId}    ({currentVec.x.ToString("0.0")},{currentVec.y.ToString("0.0")})");
-                    Console.WriteLine($"( ㄴ{test.x.ToString("0.0")},{test.y.ToString("0.0")})");
-                }
-
+                var test = x.Instance.GetSyncPosition();
+                x.__updateSyncPosition = test; 
+            }
+            System.Threading.Thread.Sleep(100);
+            foreach (var x in RealPlayerInstance)
+            {
+                var test = x.Instance.GetSyncPosition();
+                if((x.__updateSyncPosition.x != test.x) || x.__updateSyncPosition.y != test.y)
+                   x.isOther = true;
+            }
+            System.Threading.Thread.Sleep(100);
+            foreach (var x in RealPlayerInstance)
+            {
+                var test = x.Instance.GetSyncPosition();
+                if ((x.__updateSyncPosition.x != test.x) || x.__updateSyncPosition.y != test.y)
+                    x.isOther = true;
             }
         }
 
@@ -186,10 +187,12 @@ namespace AmongUsCheeseCake.Cheat
             SearchedPlayerList = SearchPlayersWithoutMine();
             FindAllRealPlayerInstance();
 
-
-            while (true)
-            { 
+            for (int i = 0; i < 10; i++)
+            {
                 UpdatePlayerPosition();
+            }
+            while (true)
+            {  
                 System.Threading.Thread.Sleep(10); 
             }
         }

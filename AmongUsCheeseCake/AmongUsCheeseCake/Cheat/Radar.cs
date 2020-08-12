@@ -68,7 +68,8 @@ public class RadarOverlay : IDisposable
 
         _fonts["arial"] = gfx.CreateFont("Arial", 12);
         _fonts["arial_small"] = gfx.CreateFont("Arial", 10);
-        _fonts["consolas"] = gfx.CreateFont("Consolas", 16);
+        _fonts["consolas"] = gfx.CreateFont("Consolas", 13); 
+        _fonts["consolas-mid"] = gfx.CreateFont("Consolas", 11);
 
     }
 
@@ -85,19 +86,30 @@ public class RadarOverlay : IDisposable
     {
         var gfx = e.Graphics;  
         gfx.ClearScene(_brushes["black 50%"]);
-        gfx.DrawText(_fonts["consolas"], _brushes["white"], new Point(0,0), " 플레이어 수 : " + cb.RealPlayerInstance.Count); 
+        gfx.FillRectangle(_brushes["black 50%"], new Rectangle(0, 0, overlaySize, 15));  
+        gfx.DrawText(_fonts["consolas-mid"], _brushes["green"], new Point(0, 0), " 2D Radar | Coder by : 에비츄(shlifedev)"); 
+        gfx.DrawText(_fonts["consolas"], _brushes["white"], new Point(0, overlaySize-18), " 플레이어 수 : " + cb.RealPlayerInstance.Count);
         foreach (var x in cb.RealPlayerInstance)
         {
             var pos = Vector2.Zero;
-            var playerBrush = _brushes["red"];   
-                pos = x.GetSyncPosition();
+            var playerBrush = _brushes["green"];   
+                pos = x.Instance.GetSyncPosition();
          
+            if(x.isOther)
+            {
+                playerBrush = _brushes["red"];
+            }
+            else
+            {
+                pos = x.Instance.GetMyPosition();
+            }
             float overlayXPer = pos.x / map_size;
             float overlayYPer = pos.y / map_size;  
             var overlayX = (overlaySize/2) + (overlaySize * (pos.x / map_size));
             var overlayY = (overlaySize/2) - (overlaySize * (pos.y / map_size)); 
+
             gfx.FillCircle(playerBrush, overlayX - 2, overlayY - 2, 2);
-            gfx.DrawText(_fonts["arial_small"], _brushes["white"], new Point(overlayX, overlayY), x.PlayerId.ToString()); 
+            gfx.DrawText(_fonts["arial_small"], _brushes["white"], new Point(overlayX, overlayY), x.Instance.PlayerId.ToString()); 
         }
     }
  

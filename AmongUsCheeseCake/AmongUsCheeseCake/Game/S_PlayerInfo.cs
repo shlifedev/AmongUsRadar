@@ -30,12 +30,7 @@ namespace AmongUsCheeseCake.Game
         {
             var size = Marshal.SizeOf(typeof(S_PlayerInfo)); ;
             return size;
-        }
-        public static int SizeOfList()
-        {
-            var size = Marshal.SizeOf(typeof(List<S_PlayerInfo>)); ;
-            return size;
-        }
+        } 
         public byte PlayerId;
         public UIntPtr PlayerName;
         public byte ColorId;
