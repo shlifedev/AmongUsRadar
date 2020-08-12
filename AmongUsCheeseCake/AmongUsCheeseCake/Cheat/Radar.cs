@@ -119,8 +119,12 @@ public class RadarOverlay : IDisposable
             }
 
             if(x.Instance.inVent == 0) 
-                gfx.DrawText(_fonts["arial_small"], _brushes["white"], new Point(overlayX, overlayY - 5), "벤트"); 
+                gfx.DrawText(_fonts["arial_small"], _brushes["white"], new Point(overlayX, overlayY - 5), "벤트");
 
+
+
+
+            gfx.DrawText(_fonts["arial_small"], _brushes["white"], new Point(overlayX, overlayY - 15), $"{pos.x.ToString("0.0")},{pos.y.ToString("0.0")}");
             gfx.FillCircle(playerBrush, overlayX - 2, overlayY - 2, 2);
             gfx.DrawText(_fonts["arial_small"], _brushes["white"], new Point(overlayX, overlayY), x.Instance.PlayerId.ToString());  
         }
