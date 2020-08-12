@@ -9,7 +9,7 @@ namespace AmongUsCheeseCake.Game
 {
     [System.Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public class S_PlayerInfo
+    public struct S_PlayerInfo
     {
         public static S_PlayerInfo FromBytes(byte[] bytes)
         {

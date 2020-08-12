@@ -11,11 +11,11 @@ namespace AmongUsCheeseCake.Game
 {
     [System.Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public class S_PlayerControll
+    public struct S_PlayerControll
     {
         public static S_PlayerControll FromBytes(byte[] bytes)
         {
-            GCHandle gcHandle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
+            GCHandle gcHandle = GCHandle.Alloc(bytes, GCHandleType.Pinned); 
             var data = (S_PlayerControll)Marshal.PtrToStructure(gcHandle.AddrOfPinnedObject(), typeof(S_PlayerControll));
             gcHandle.Free();
             return data;

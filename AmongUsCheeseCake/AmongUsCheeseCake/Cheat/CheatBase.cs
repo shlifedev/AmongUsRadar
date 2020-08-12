@@ -28,7 +28,7 @@ namespace AmongUsCheeseCake.Cheat
         private List<CachedPlayerControllInfo> SearchedPlayerList = new List<CachedPlayerControllInfo>();  
         public List<CachedPlayerControllInfo> RealPlayerInstance = new List<CachedPlayerControllInfo>(); 
         public int localNetworkID = 483328960;
-
+        public RadarOverlay radar;
         private Thread tickThread = null;
         private Thread radarThread = null;
 
@@ -123,27 +123,25 @@ namespace AmongUsCheeseCake.Cheat
             {
                 if (tickThread != null)
                 {
-                    tickThread.Interrupt();
+                    tickThread.Abort();
                     tickThread = null;
-                }
-                if (radarThread != null)
-                {
-                    radarThread.Interrupt();
-                    radarThread = null;
-                }
-
+                    Console.WriteLine("thread suspend..");
+                } 
 
  
-                 
-                tickThread = new Thread(Tick);
-                radarThread = new Thread(Radar); 
+                if(tickThread == null)
+                    tickThread = new Thread(Tick);
+
+                if (radarThread == null)
+                    radarThread = new Thread(Radar); 
                 this.RealPlayerInstance.Clear(); 
                 this.SearchedPlayerList.Clear(); 
 
 
-
+                
                 tickThread.Start();
-                radarThread.Start();
+                if(radarThread.ThreadState == ThreadState.Unstarted)
+                   radarThread.Start();
             }
         }
 
@@ -151,26 +149,22 @@ namespace AmongUsCheeseCake.Cheat
         /// 로깅 테스트
         /// </summary>
         public void UpdatePlayerPosition()
-        {
+        {  
             foreach (var x in RealPlayerInstance)
             {
                 var test = x.Instance.GetSyncPosition();
-                x.__updateSyncPosition = test; 
-            }
-            System.Threading.Thread.Sleep(100);
-            foreach (var x in RealPlayerInstance)
-            {
-                var test = x.Instance.GetSyncPosition();
-                if((x.__updateSyncPosition.x != test.x) || x.__updateSyncPosition.y != test.y)
-                   x.isOther = true;
-            }
-            System.Threading.Thread.Sleep(100);
-            foreach (var x in RealPlayerInstance)
-            {
-                var test = x.Instance.GetSyncPosition();
-                if ((x.__updateSyncPosition.x != test.x) || x.__updateSyncPosition.y != test.y)
-                    x.isOther = true;
-            }
+
+                if(x.__updateSyncPosition.x == 0 && x.__updateSyncPosition.y == 0)
+                {
+                    x.__updateSyncPosition = test;
+                    continue;
+                }
+                else
+                {
+                    if ((x.__updateSyncPosition.x != test.x) || x.__updateSyncPosition.y != test.y)
+                        x.isOther = true;
+                } 
+            } 
         }
 
 
@@ -181,27 +175,21 @@ namespace AmongUsCheeseCake.Cheat
         }
         public void Tick()
         { 
-            Console.WriteLine("Tick Thread!");
-
-            //플레이어 찾기
+            Console.WriteLine("Start Tick Thread!"); 
             SearchedPlayerList = SearchPlayersWithoutMine();
-            FindAllRealPlayerInstance();
-
-            for (int i = 0; i < 10; i++)
+            FindAllRealPlayerInstance(); 
+            while (true)
             {
                 UpdatePlayerPosition();
-            }
-            while (true)
-            {  
                 System.Threading.Thread.Sleep(10); 
             }
         }
         public void Radar()
         {
-            Console.WriteLine("Radar Thread!");
-            RadarOverlay rd = new RadarOverlay();
-            rd.cb = this;
-            rd.Run();
+            Console.WriteLine("Start Radar Thread!");
+            radar = new RadarOverlay();
+            radar.cb = this;
+            radar.Run();
         }
 
 

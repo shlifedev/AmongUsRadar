@@ -24,7 +24,27 @@ namespace AmongUsCheeseCake
             CheatBase cb = new CheatBase();
             cb.Init();
 
-
+            while(true)
+            {
+                var command = Console.ReadLine();
+                if(command.ToLower().Contains("reset"))
+                {
+                    cb.Init();
+                }
+                if (command.ToLower().Contains("mapsize"))
+                {
+                    var x = command.Split(' ');
+                    var size = int.Parse(x[1]);
+                    cb.radar.map_size = size;
+                }
+                if (command.ToLower().Contains("overlaysize"))
+                {
+                    var x = command.Split(' ');
+                    var size = int.Parse(x[1]);
+                    cb.radar.SetWindowSize(size, size);
+                    cb.radar.overlaySize = size;
+                }
+            }
 
             System.Threading.Thread.Sleep(100000000);
         }

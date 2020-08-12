@@ -42,7 +42,10 @@ public class RadarOverlay : IDisposable
         _window.DrawGraphics += _window_DrawGraphics;
         _window.SetupGraphics += _window_SetupGraphics;
     }
-
+    public void SetWindowSize(int x, int y)
+    {
+        _window.Resize(x,y);
+    }
     private void _window_SetupGraphics(object sender, SetupGraphicsEventArgs e)
     {
         var gfx = e.Graphics;
@@ -83,7 +86,7 @@ public class RadarOverlay : IDisposable
 
      
     private void _window_DrawGraphics(object sender, DrawGraphicsEventArgs e)
-    {
+    { 
         var gfx = e.Graphics;  
         gfx.ClearScene(_brushes["black 50%"]);
         gfx.FillRectangle(_brushes["black 50%"], new Rectangle(0, 0, overlaySize, 15));  
@@ -94,8 +97,9 @@ public class RadarOverlay : IDisposable
             var pos = Vector2.Zero;
             var playerBrush = _brushes["green"];   
                 pos = x.Instance.GetSyncPosition();
-         
-            if(x.isOther)
+                    
+
+            if (x.isOther)
             {
                 playerBrush = _brushes["red"];
             }
@@ -106,10 +110,19 @@ public class RadarOverlay : IDisposable
             float overlayXPer = pos.x / map_size;
             float overlayYPer = pos.y / map_size;  
             var overlayX = (overlaySize/2) + (overlaySize * (pos.x / map_size));
-            var overlayY = (overlaySize/2) - (overlaySize * (pos.y / map_size)); 
+            var overlayY = (overlaySize/2) - (overlaySize * (pos.y / map_size));  
+
+            x.ReadMemory();
+            if(x.isOther && x.isImposter)
+            {
+                playerBrush = _brushes["blue"]; 
+            }
+
+            if(x.Instance.inVent == 0) 
+                gfx.DrawText(_fonts["arial_small"], _brushes["white"], new Point(overlayX, overlayY - 5), "벤트"); 
 
             gfx.FillCircle(playerBrush, overlayX - 2, overlayY - 2, 2);
-            gfx.DrawText(_fonts["arial_small"], _brushes["white"], new Point(overlayX, overlayY), x.Instance.PlayerId.ToString()); 
+            gfx.DrawText(_fonts["arial_small"], _brushes["white"], new Point(overlayX, overlayY), x.Instance.PlayerId.ToString());  
         }
     }
  

@@ -15,10 +15,13 @@ namespace AmongUsCheeseCake.Cheat
         public string offset;
         public S_PlayerControll Instance; 
         public bool isOther = false;
-        public Vector2 __updateSyncPosition = Vector2.Zero; 
+        public bool isImposter = false;
+        public Vector2 __updateSyncPosition = Vector2.Zero;  
         public void ReadMemory()
         {
-
+            Instance = S_PlayerControll.FromBytes(CheatBase.Memory.ReadBytes(offset, S_PlayerControll.SizeOf()));
+            if(Instance.inVent == 0)
+                isImposter = true;
         } 
     }
 }
