@@ -69,18 +69,13 @@ namespace AmongUsCheeseCake.Game
                     return vec2;
                 }
                 else
-                {
-
-                     
+                { 
                     return Vector2.Zero;
                 } 
-            }
-
-
+            } 
             catch
-            { 
-                var x =  new Vector2(0,0);
-                return x;
+            {
+                return Vector2.Zero;
             }
         }
 

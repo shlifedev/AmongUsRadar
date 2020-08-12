@@ -15,7 +15,7 @@ namespace AmongUsCheeseCake.Cheat
 {
     public class CheatBase
     {
-        static string PlayerControllPattern = "10 5E 79 11 ?? ?? ?? ??";
+        static string PlayerControllPattern = "C0 35 69 10 ?? ?? ?? ??";
         static string GameDataPattern = "A8 A4 B0 06 ?? ?? ?? ??";
 
         public static Mem Memory = new Mem();
@@ -27,8 +27,10 @@ namespace AmongUsCheeseCake.Cheat
 
         private List<S_PlayerControll> SearchedPlayerList = new List<S_PlayerControll>();
         public List<S_PlayerControll> RealPlayerInstance = new List<S_PlayerControll>();
-        private Dictionary<int, S_PlayerControll> RealPlayerInstancePID = new Dictionary<int, S_PlayerControll>(); 
+        private Dictionary<int, S_PlayerControll> RealPlayerInstancePID = new Dictionary<int, S_PlayerControll>();
         private Dictionary<int, Vector2> UpdatedVectorDictionary = new Dictionary<int, Vector2>();
+        public int localPID = -999;
+
         private Thread tickThread = null;
         private Thread radarThread = null;
 
@@ -60,11 +62,45 @@ namespace AmongUsCheeseCake.Cheat
             foreach (var x in SearchedPlayerList)
             {
                 var vec2 = x.GetSyncPosition();
+                if (vec2.x <= 300 && vec2.y <= 300)
+                { 
+                    if (vec2.IsZero() == false && vec2.IsGarbage() == false)
+                    {
+                        if (UpdatedVectorDictionary.ContainsKey(idx) == false)
+                        {
+                            UpdatedVectorDictionary.Add(idx, vec2);
+                        }
+                        else
+                        {
+                            var originalData = UpdatedVectorDictionary[idx];
+                            var currentVec = vec2;
+                            if (originalData.x != currentVec.x || originalData.y != currentVec.y)
+                            { 
+                                if (RealPlayerInstancePID.ContainsKey(x.PlayerId) == false)
+                                {
+                                    RealPlayerInstance.Add(x);
+                                    RealPlayerInstancePID.Add(x.PlayerId, x);
+                                }
+                            }
+                        }
+                    }  
+                } 
+            }
+        }
 
+        /// <summary>
+        /// 2회이상 실행해야 찾을 수 있음
+        /// </summary>
+        void UpdateMyPlayer()
+        {
+            int idx = 2000;
+            foreach (var x in SearchedPlayerList)
+            {
+                var vec2 = x.GetMyPosition();  
                 if (vec2.IsZero() == false)
                 {
                     if (UpdatedVectorDictionary.ContainsKey(idx) == false)
-                    {
+                    { 
                         UpdatedVectorDictionary.Add(idx, vec2);
                     }
                     else
@@ -74,17 +110,18 @@ namespace AmongUsCheeseCake.Cheat
                         if (originalData.x != currentVec.x || originalData.y != currentVec.y)
                         {
                             if (RealPlayerInstancePID.ContainsKey(x.PlayerId) == false)
-                            {
+                            { 
+                                localPID = x.PlayerId;
                                 RealPlayerInstance.Add(x);
-                                RealPlayerInstancePID.Add(x.PlayerId, x);
-                            }
+                                RealPlayerInstancePID.Add(x.PlayerId, x); 
+                            } 
                         }
                     }
                 }
                 idx++;
             }
         }
-         
+
 
 
 
@@ -129,15 +166,15 @@ namespace AmongUsCheeseCake.Cheat
 
 
 
+                localPID = -999;
                 tickThread = new Thread(Tick);
                 radarThread = new Thread(Radar);
                 this.UpdatedVectorDictionary.Clear();
                 this.RealPlayerInstance.Clear();
                 this.RealPlayerInstancePID.Clear();
                 this.SearchedPlayerList.Clear();
-                this.SearchedPlayerList = SearchPlayerInfoList();
+                this.SearchedPlayerList = SearchPlayerInfoList(); 
 
- 
 
 
 
@@ -149,9 +186,18 @@ namespace AmongUsCheeseCake.Cheat
         public void UpdatePlayerPosition()
         {
             foreach (var x in RealPlayerInstance)
-            {
-                var currentVec = x.GetSyncPosition();
-                Console.WriteLine("Player ID : " + x.PlayerId + "    X " + currentVec.x + ", Y " + currentVec.y + ",  " + x.NetTransform);
+            { 
+                if (localPID == x.PlayerId)
+                {
+                    var currentVec = x.GetMyPosition();
+                    Console.WriteLine("My Player ID : " + x.PlayerId + "    X " + currentVec.x + ", Y " + currentVec.y + ",  " + x.NetTransform);
+                } 
+                else
+                {
+                    var currentVec = x.GetSyncPosition();
+                    Console.WriteLine("Player ID : " + x.PlayerId + "    X " + currentVec.x + ", Y " + currentVec.y + ",  " + x.NetTransform);
+                }
+             
             }
         }
 
@@ -167,7 +213,8 @@ namespace AmongUsCheeseCake.Cheat
             while (true)
             {
                 UpdatePlayerList(); 
-                UpdatePlayerPosition();
+                UpdateMyPlayer();
+                UpdatePlayerPosition(); 
                 System.Threading.Thread.Sleep(10);
             }
         }

@@ -22,7 +22,12 @@ namespace AmongUsCheeseCake.Game
 
         public bool IsZero()
         {
-            if(this.x == 0 && this.y == 0) return true;
+            if (this.x == 0 && this.y == 0) return true;
+            else return false;
+        }
+        public bool IsGarbage()
+        {
+            if (this.x == float.MaxValue && this.y == float.MaxValue) return true;
             else return false;
         }
         public static Vector2 Zero

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using AmongUsCheeseCake.Cheat;
+using AmongUsCheeseCake.Game;
 using GameOverlay.Drawing;
 using GameOverlay.Windows;
 
@@ -14,11 +15,9 @@ public class RadarOverlay : IDisposable
     private readonly Dictionary<string, SolidBrush> _brushes;
     private readonly Dictionary<string, Font> _fonts;
     private readonly Dictionary<string, Image> _images;
-     
-    private Random _random;
-    private long _lastRandomSet;
-    private List<Action<Graphics, float, float>> _randomFigures;
 
+    public float map_size = 50;
+    public float overlaySize = 350;
     public RadarOverlay()
     {
         _brushes = new Dictionary<string, SolidBrush>();
@@ -32,7 +31,7 @@ public class RadarOverlay : IDisposable
             TextAntiAliasing = true
         };
 
-        _window = new GraphicsWindow(0, 0, 300, 300, gfx)
+        _window = new GraphicsWindow(0, 0, (int)overlaySize, (int)overlaySize, gfx)
         {
             FPS = 60,
             IsTopmost = true,
@@ -64,10 +63,11 @@ public class RadarOverlay : IDisposable
         _brushes["random"] = gfx.CreateSolidBrush(0, 0, 0);
         _brushes["black 50%"] = gfx.CreateSolidBrush(0, 0, 0, 0.5f);
 
-        if (e.RecreateResources) return;
+        if (e.RecreateResources)
+            return;
 
         _fonts["arial"] = gfx.CreateFont("Arial", 12);
-        _fonts["consolas"] = gfx.CreateFont("Consolas", 14); 
+        _fonts["consolas"] = gfx.CreateFont("Consolas", 16); 
    
     }
 
@@ -79,23 +79,29 @@ public class RadarOverlay : IDisposable
     }
 
 
-
-    public float map_size = 50;
-
+     
     private void _window_DrawGraphics(object sender, DrawGraphicsEventArgs e)
     {
         var gfx = e.Graphics;  
         gfx.ClearScene(_brushes["black 50%"]);
-
-        Console.WriteLine(cb.RealPlayerInstance.Count);
+        gfx.DrawText(_fonts["consolas"], _brushes["white"], new Point(0,0), " 플레이어 수 : " + cb.RealPlayerInstance.Count); 
         foreach (var x in cb.RealPlayerInstance)
         {
-            var pos = x.GetSyncPosition(); 
+            var pos = Vector2.Zero;
+            var playerBrush = x.PlayerId == cb.localPID ? _brushes["green"] : _brushes["red"];
+            if(x.PlayerId == cb.localPID)
+            {
+                pos = x.GetMyPosition();
+            }
+            else
+            {
+                pos = x.GetSyncPosition();
+            }
             float overlayXPer = pos.x / map_size;
             float overlayYPer = pos.y / map_size;  
-            var overlayX = 150 + (300 * (pos.x / map_size));
-            var overlayY = 150 - (300 * (pos.y / map_size)); 
-            gfx.FillRectangle(_brushes["red"], overlayX - 2, overlayY - 2, overlayX + 2, overlayY + 2);
+            var overlayX = (overlaySize/2) + (overlaySize * (pos.x / map_size));
+            var overlayY = (overlaySize/2) - (overlaySize * (pos.y / map_size)); 
+            gfx.FillRectangle(playerBrush, overlayX - 2, overlayY - 2, overlayX + 2, overlayY + 2);
         }
     }
  
