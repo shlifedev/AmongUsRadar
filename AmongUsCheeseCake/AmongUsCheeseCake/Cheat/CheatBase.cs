@@ -45,6 +45,7 @@ namespace AmongUsCheeseCake.Cheat
         private Thread radarThread = null;
 
  
+        public bool drawDisable = false;
 
 
         List<CachedPlayerControllInfo> SearchPlayersWithoutMine()
@@ -209,11 +210,20 @@ namespace AmongUsCheeseCake.Cheat
             {
                 if (test_rect)
                 {
-                    Process lol = proc[0];
-                    IntPtr ptr = lol.MainWindowHandle;
-                    Rect rect = new Rect();
-                    GetWindowRect(ptr, ref rect);
-                    radar.SetWindowPos(rect.Left + 9, rect.Top + 31);
+                    if(MemorySharp.Windows.MainWindow.IsActivated)
+                    {
+                        Process lol = proc[0];
+                        IntPtr ptr = lol.MainWindowHandle;
+                        Rect rect = new Rect();
+                        GetWindowRect(ptr, ref rect);
+                        radar.SetWindowPos(rect.Left + 9, rect.Top + 31);
+                        radar.drawDisable = false;
+                    }
+                    else
+                    {
+                        radar.drawDisable = true;
+                    }
+              
                 }
                 UpdatePlayerPosition();
                 System.Threading.Thread.Sleep(10);

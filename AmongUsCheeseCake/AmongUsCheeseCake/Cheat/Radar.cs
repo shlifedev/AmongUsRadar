@@ -15,7 +15,7 @@ public class RadarOverlay : IDisposable
     private readonly Dictionary<string, SolidBrush> _brushes;
     private readonly Dictionary<string, Font> _fonts;
     private readonly Dictionary<string, Image> _images;
-
+    public bool drawDisable = false;
 
     private readonly Dictionary<byte, Vector2> _diedPlayersMap;
     public float map_size = 50;
@@ -209,6 +209,11 @@ public class RadarOverlay : IDisposable
             }
             gfx.DrawText(_fonts["arial_small"], _brushes["white"], new Point(overlayX, overlayY - 15), $"{pos.x.ToString("0.0")},{pos.y.ToString("0.0")}");
       
+        }
+
+        if(drawDisable)
+        {
+            gfx.ClearScene();
         }
     } 
 
