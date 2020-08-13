@@ -30,4 +30,6 @@
   - Method Hook
   
   
+ # Memo
+ https://stackoverflow.com/questions/25354393/passing-multiple-parameters-using-createremotethread-in-c-sharp
  
