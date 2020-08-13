@@ -20,7 +20,7 @@
   - Rage Mode
   - Filter & Show Dead Player
   - Filter & Show Imposter
-  
+  - Method Hook
   
   
  

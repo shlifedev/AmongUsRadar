@@ -17,7 +17,8 @@ namespace AmongUsCheeseCake.Cheat
         public IntPtr offset_ptr;
         public S_PlayerControll Instance; 
         public bool isOther = false;
-        public bool isImposter = false;
+        public bool isMine;
+        public bool isImposter = false; 
         public Vector2 __updateSyncPosition = Vector2.Zero;  
         public void ReadMemory()
         {

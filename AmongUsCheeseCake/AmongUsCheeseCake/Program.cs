@@ -25,7 +25,7 @@ namespace AmongUsCheeseCake
             CheatBase cb = new CheatBase();
             cb.Init();
 
-            while(true)
+            while (true)
             {
                 var command = Console.ReadLine();
                 if(command.ToLower().Contains("reset"))
