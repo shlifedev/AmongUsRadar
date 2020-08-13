@@ -15,7 +15,8 @@
   - 2D Radar
   - 2D Radar Player Color
   - 2D Radar Imposter
-  - 2D Radar DeadBody
+  - 2D Radar Latest Died Position
+ 
  
  # Soon
   - 2D ESP
