@@ -29,10 +29,8 @@ namespace AmongUsCheeseCake.Cheat
 
         [DllImport("user32.dll")]
         public static extern bool GetWindowRect(IntPtr hwnd, ref Rect rectangle);
-
-        static string PlayerControllPattern = "B0 45 D4 0F ?? ?? ?? ??";
-        static string GameDataPattern = "A8 A4 B0 06 ?? ?? ?? ??";
-
+        static string PlayerControllPattern = "30 6B 91 11 ?? ?? ?? ??";
+        static string GameDataPattern = "08 0C E5 06 ?? ?? ?? ??";
         public static Mem Memory = new Mem();
 
 
@@ -64,7 +62,7 @@ namespace AmongUsCheeseCake.Cheat
                 // 모든 플레이어의 공통 owner id
                 if (playerControll.OwnerId == 257 && playerControll.netId != 0)
                 {
-                    Console.WriteLine("add Players :: " + playerControll.PlayerId);
+                    Console.WriteLine($"add Players :: " + playerControll.PlayerId + $" {x.GetAddress()}");
                     list.Add(new CachedPlayerControllInfo() {
                         Instance = playerControll,
                         offset = x.GetAddress()
@@ -179,7 +177,29 @@ namespace AmongUsCheeseCake.Cheat
                     if ((x.__updateSyncPosition.x != test.x) || x.__updateSyncPosition.y != test.y)
                         x.isOther = true;
                 } 
-            } 
+            }
+            int xx = 0;
+            CachedPlayerControllInfo v = null;
+            for (int i = 0; i < RealPlayerInstance.Count; i++)
+            { 
+                if(RealPlayerInstance[i].isOther)
+                {
+                    xx++;
+                }
+                else
+                {
+                    v = RealPlayerInstance[i];
+                }
+            }
+            if (v != null)
+            {
+                if (xx == RealPlayerInstance.Count - 1)
+                {
+                    v.ReadMemory(); 
+                    Console.WriteLine("Find My Local Player => " + v.offset +" , " + v.Instance.PlayerId);
+                    v.isMine = true;
+                }
+            }
         }
 
 
@@ -220,6 +240,8 @@ namespace AmongUsCheeseCake.Cheat
             radar = new RadarOverlay();
             radar.cb = this;
             radar.Run();
+             
+
         }
 
 

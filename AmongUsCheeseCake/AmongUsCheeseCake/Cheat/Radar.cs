@@ -17,7 +17,9 @@ public class RadarOverlay : IDisposable
     private readonly Dictionary<string, Image> _images;
 
     public float map_size = 50;
-    public float overlaySize = 350;
+    public float overlaySize = 350; 
+    public float center = 0;
+
     public RadarOverlay()
     {
         _brushes = new Dictionary<string, SolidBrush>();
@@ -62,7 +64,7 @@ public class RadarOverlay : IDisposable
 
         _brushes["black"] = gfx.CreateSolidBrush(0, 0, 0);
         _brushes["white"] = gfx.CreateSolidBrush(255, 255, 255);
-        _brushes["red"] = gfx.CreateSolidBrush(255, 0, 0);
+        _brushes["red"] = gfx.CreateSolidBrush(255, 0, 0); 
         _brushes["green"] = gfx.CreateSolidBrush(0, 255, 0);
         _brushes["blue"] = gfx.CreateSolidBrush(0, 0, 255);
         _brushes["background"] = gfx.CreateSolidBrush(0x33, 0x36, 0x3F);
@@ -87,51 +89,55 @@ public class RadarOverlay : IDisposable
         foreach (var pair in _images) pair.Value.Dispose();
     }
 
-
-    public float center = 0;
+ 
      
     private void _window_DrawGraphics(object sender, DrawGraphicsEventArgs e)
-    { 
+    {
+
+        center = -20f;
+        map_size = 100;
+
         var gfx = e.Graphics;  
         gfx.ClearScene(_brushes["black 50%"]);
         gfx.FillRectangle(_brushes["black 50%"], new Rectangle(0, 0, overlaySize, 15));  
         gfx.DrawText(_fonts["consolas-mid"], _brushes["green"], new Point(0, 0), " 2D Radar | Coder by : 에비츄(shlifedev)"); 
         gfx.DrawText(_fonts["consolas"], _brushes["white"], new Point(0, overlaySize-18), " 플레이어 수 : " + cb.RealPlayerInstance.Count);
-        foreach (var x in cb.RealPlayerInstance)
+        foreach (var _instance in cb.RealPlayerInstance)
         {
+
             var pos = Vector2.Zero;
             var playerBrush = _brushes["green"];   
-                pos = x.Instance.GetSyncPosition();
+     
                     
 
-            if (x.isOther)
+            if (_instance.isOther && _instance.isMine == false)
             {
                 playerBrush = _brushes["red"];
+                pos = _instance.Instance.GetSyncPosition();
             }
-            else
+            else if(_instance.isMine)
             {
-                pos = x.Instance.GetMyPosition();
-            }
-            float overlayXPer = (pos.x +center) / map_size; 
-            float overlayYPer = (pos.y +center) / map_size;  
+                pos = _instance.Instance.GetMyPosition();
+                playerBrush = _brushes["green"];
+            }  
+             
             var overlayX = (overlaySize/2) + (overlaySize * ((pos.x +center) / map_size));
             var overlayY = (overlaySize/2) - (overlaySize * ((pos.y -center) / map_size));  
+            _instance.ReadMemory();
+             
+            if(_instance.isOther && _instance.isImposter) 
+                playerBrush = _brushes["blue"];
 
-            x.ReadMemory();
-            if(x.isOther && x.isImposter)
-            {
-                playerBrush = _brushes["blue"]; 
-            }
-
-            if(x.Instance.inVent == 0) 
+            if (_instance.Instance.inVent == 0)
                 gfx.DrawText(_fonts["arial_small"], _brushes["white"], new Point(overlayX, overlayY - 5), "벤트");
+           
+     
 
 
 
-
-            gfx.DrawText(_fonts["arial_small"], _brushes["white"], new Point(overlayX, overlayY - 15), $"{pos.x.ToString("0.0")},{pos.y.ToString("0.0")}");
+           // gfx.DrawText(_fonts["arial_small"], _brushes["white"], new Point(overlayX, overlayY - 15), $"{pos.x.ToString("0.0")},{pos.y.ToString("0.0")}");
             gfx.FillCircle(playerBrush, overlayX - 2, overlayY - 2, 2);
-            gfx.DrawText(_fonts["arial_small"], _brushes["white"], new Point(overlayX, overlayY), x.Instance.PlayerId.ToString());  
+          //  gfx.DrawText(_fonts["arial_small"], _brushes["white"], new Point(overlayX, overlayY), _instance.Instance.PlayerId.ToString());  
         }
     }
  
