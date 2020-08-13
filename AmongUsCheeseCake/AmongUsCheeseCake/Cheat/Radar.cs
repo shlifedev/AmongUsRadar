@@ -110,30 +110,27 @@ public class RadarOverlay : IDisposable
         foreach (var x in cb.RealPlayerInstance)
         {
             var pos = Vector2.Zero;
-            var playerBrush = _brushes["green"];   
-                pos = x.Instance.GetSyncPosition();
+            var playerBrush = _brushes["black"]; 
+              
                     
 
-            if (x.isOther)
+            if (x.isOther && x.isMine == false)
             {
                 playerBrush = _brushes["red"];
+                pos = x.Instance.GetSyncPosition();
             }
-            else
+            else if(x.isMine )
             {
-                pos = x.Instance.GetMyPosition(); 
+                pos = x.Instance.GetMyPosition();
+                playerBrush = _brushes["green"];
             } 
             var overlayX = (overlaySize/2) + (overlaySize * ((pos.x +center) / map_size));
             var overlayY = (overlaySize/2) - (overlaySize * ((pos.y -center) / map_size));  
 
-            x.ReadMemory();
-            if(x.isOther && x.isImposter)
-            {
-                playerBrush = _brushes["blue"]; 
-            }
-
-            if(x.Instance.inVent == 0) 
-                gfx.DrawText(_fonts["arial_small"], _brushes["white"], new Point(overlayX, overlayY - 5), "벤트");
-
+            x.ReadMemory(); 
+             
+            if(x.PlayerInfo.Value.IsImpostor)
+                gfx.DrawText(_fonts["arial_small"], _brushes["white"], new Point(overlayX, overlayY - 5), "임포스터");
 
 
 

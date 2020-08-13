@@ -17,30 +17,51 @@ namespace AmongUsCheeseCake.Cheat
         public IntPtr offset_ptr;
         public PlayerControll Instance; 
         public bool isOther = false;
-        public bool isMine;
-        public bool isImposter = false; 
+        public bool isMine; 
         public Vector2 __updateSyncPosition = Vector2.Zero;  
-        public void ReadMemory()
+
+
+    
+        private string playerInfoOffset = null;
+        public PlayerInfo? PlayerInfo
         {
-            
-            Instance = PlayerControll.FromBytes(CheatBase.Memory.ReadBytes(offset, PlayerControll.SizeOf()));
-            if(Instance.inVent == 1) 
-                isImposter = true;
+            get
+            {
+                if(m_pInfo == null)
+                {
+                    var scanTask = CheatBase.Memory.AoBScan(EngineOffset.Pattern.PlayerControl_GetData);
+                        scanTask.Wait();
+
+                    Console.WriteLine("PlayerControl.GetData() Scan Count => " + scanTask.Result.Count());
+
+                    if(scanTask.Result.Count() == 1)
+                    { 
+                        var ptr = (IntPtr)scanTask.Result.First();
+                        var playerInfoAddress = CheatBase.ProcessMemory.CallFunction(ptr, this.offset_ptr).GetAddress();
+                            playerInfoOffset = playerInfoAddress;
+                        PlayerInfo pInfo = Game.PlayerInfo.FromBytes(CheatBase.Memory.ReadBytes(playerInfoAddress, Game.PlayerInfo.SizeOf()));
+                        this.m_pInfo = pInfo;
+                        Console.WriteLine("PlayerControl.GetData() Scan Complete");
+                    }
+                }
+                else
+                {
+                    PlayerInfo pInfo = Game.PlayerInfo.FromBytes(CheatBase.Memory.ReadBytes(playerInfoOffset, Game.PlayerInfo.SizeOf()));
+                    this.m_pInfo = pInfo; 
+                } 
+                return m_pInfo;
+            }
+        }
+
+        private PlayerInfo? m_pInfo = null;
+        public void ReadMemory()
+        { 
+            Instance = PlayerControll.FromBytes(CheatBase.Memory.ReadBytes(offset, PlayerControll.SizeOf())); 
         }
 
         #region
 
 
-        static IntPtr __getDataAddress = new IntPtr(0x516D5DF0); 
-        public IntPtr __getData()
-        { 
-            return CheatBase.MemorySharp.Assembly.Execute<IntPtr>(__getDataAddress, Binarysharp.MemoryManagement.Assembly.CallingConvention.CallingConventions.Thiscall, offset_ptr);
-        }
-        static IntPtr __getVisibleAddress = new IntPtr(0x54615E90);
-        public bool __getVisible()
-        {
-            return CheatBase.MemorySharp.Assembly.Execute<bool>(__getVisibleAddress, Binarysharp.MemoryManagement.Assembly.CallingConvention.CallingConventions.Fastcall, offset_ptr);
-        }
     
 
         public void __setKillTimer()

@@ -73,8 +73,10 @@ namespace AmongUsCheeseCake
                     CheatBase.MemorySharp["MethodDLL"]["Test"].Execute(CallingConventions.Stdcall);
 
                 }
-                if (command.ToLower().Contains("realrealreal"))
+                if (command.ToLower().Contains("good"))
                 {
+                    
+
                     Process proc = Process.GetProcessesByName("Among Us")[0];
                     ProcessMemory pm = new ProcessMemory(proc);
                     pm.Open(ProcessAccess.AllAccess); 
@@ -82,17 +84,18 @@ namespace AmongUsCheeseCake
                     {
                         if(true == x.isMine)
                         {
-                            var t = pm.CallFunction(new IntPtr(0x516D5DF0), x.offset_ptr);
+                            var t = pm.CallFunction(new IntPtr(0x068C5DF0), x.offset_ptr);
 
                             Console.WriteLine(t +"  ,  " + t.GetAddress());
                         }
                         else
                         {
-                            var t = pm.CallFunction(new IntPtr(0x516D5DF0), x.offset_ptr);
+                            var t = pm.CallFunction(new IntPtr(0x068C5DF0), x.offset_ptr);
                             var bytes = CheatBase.Memory.ReadBytes(t.GetAddress(), PlayerInfo.SizeOf()); 
                             Console.WriteLine("function result :: " + t.GetAddress());
                             PlayerInfo info = PlayerInfo.FromBytes(bytes);  
 
+                            var xz = x.PlayerInfo;
 
                             var data = CheatBase.MemorySharp.ReadString((IntPtr)info.PlayerName.ToUInt32(), false, 512);
                             Console.WriteLine(info.IsImpostor + "," + data); 

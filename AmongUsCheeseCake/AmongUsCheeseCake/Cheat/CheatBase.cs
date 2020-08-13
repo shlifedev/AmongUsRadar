@@ -2,6 +2,7 @@
 using AmongUsCheeseCake.Game;
 using Binarysharp.MemoryManagement;
 using Memory;
+using ProcessUtil;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -30,13 +31,11 @@ namespace AmongUsCheeseCake.Cheat
 
         [DllImport("user32.dll")]
         public static extern bool GetWindowRect(IntPtr hwnd, ref Rect rectangle);
-
-        static string PlayerControllPattern = "D8 03 A5 06 ?? ?? ?? ??";
-        static string GameDataPattern = "A8 A4 B0 06 ?? ?? ?? ??";
+          
 
         public static Mem Memory = new Mem();
         public static MemorySharp MemorySharp;
-
+        public static ProcessMemory ProcessMemory;
         private string m_cached_gameDataOffset = null;
 
         private List<CachedPlayerControllInfo> SearchedPlayerList = new List<CachedPlayerControllInfo>();
@@ -53,7 +52,7 @@ namespace AmongUsCheeseCake.Cheat
         {
 
             List<CachedPlayerControllInfo> list = new List<CachedPlayerControllInfo>();
-            var result = Memory.AoBScan(PlayerControllPattern, true, true);
+            var result = Memory.AoBScan(EngineOffset.Pattern.PlayerControl, true, true);
             result.Wait();
             var results =    result.Result;
             foreach (var x in results)
@@ -84,7 +83,7 @@ namespace AmongUsCheeseCake.Cheat
         {
 
             List<PlayerControll> list = new List<PlayerControll>();
-            var result = Memory.AoBScan(PlayerControllPattern, true, true);
+            var result = Memory.AoBScan(EngineOffset.Pattern.PlayerControl, true, true);
             result.Wait();
             var results =    result.Result;
             foreach (var x in results)
@@ -110,33 +109,17 @@ namespace AmongUsCheeseCake.Cheat
 
 
 
-        /// <summary>
-        /// 게임데이터 오프셋을 새로고침함
-        /// </summary>
-        public void RefreshGameDataOffset()
-        {
-            string offset = null;
-            var result = Memory.AoBScan(GameDataPattern, true, true);
-            result.Wait();
-            var results = result.Result;
-
-            foreach (var x in results)
-            {
-                var bytes = Memory.ReadBytes(x.GetAddress(), GameData.SizeOf());
-                var gameData = GameData.FromBytes(bytes);
-                // OWNER ID가 -2이고, NetId가 4294967295가 아닌 객체는 실제 인스턴스이다.
-                // 4294967295(uint의 max값)은, 이미 인스턴스가 해제된 가비지값을 가리킴
-                if (gameData.OwnerId == -2 && gameData.NetId != 4294967295)
-                    offset = x.GetAddress();
-            }
-            this.m_cached_gameDataOffset = offset;
-        }
-
+ 
         public void Init()
         {
      
             var b = Memory.OpenProcess("Among Us");
             MemorySharp = new MemorySharp(Memory.GetProcIdFromName("Among Us")); 
+            Process proc = Process.GetProcessesByName("Among Us")[0];
+            ProcessMemory = new ProcessMemory(proc);
+            ProcessMemory.Open(ProcessAccess.AllAccess);
+
+
             if (b)
             {
                 if (tickThread != null)
@@ -183,6 +166,26 @@ namespace AmongUsCheeseCake.Cheat
                         x.isOther = true;  
                 }
             }
+             
+            CachedPlayerControllInfo pc = null;
+            int cnt = 0;
+            for(int i = 0; i< RealPlayerInstance.Count; i++ )
+            {
+                if (RealPlayerInstance[i].isOther)
+                {
+                    cnt++;
+                    continue;
+                }
+                else
+                {
+                    pc = RealPlayerInstance[i];
+                }
+            } 
+            if (cnt == RealPlayerInstance.Count-1)
+            {
+                pc.isMine = true;
+                pc.isOther = false;
+            }
         }
 
 
@@ -198,6 +201,7 @@ namespace AmongUsCheeseCake.Cheat
             FindAllRealPlayerInstance();
 
             var proc = Process.GetProcessesByName("Among Us");
+
             bool test_rect = false;
             if (proc != null)
             {
@@ -215,6 +219,8 @@ namespace AmongUsCheeseCake.Cheat
                 }
                 UpdatePlayerPosition();
                 System.Threading.Thread.Sleep(10);
+
+
             }
         }
         public void Radar()

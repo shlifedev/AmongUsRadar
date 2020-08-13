@@ -98,12 +98,7 @@
     <Compile Include="Game\Vector2.cs" />
     <Compile Include="Game\DumpEnum.cs" />
     <Compile Include="Cheat\CheatBase.cs" />
-    <Compile Include="ProcUtil\EnginePointer.cs" />
-    <Compile Include="ProcUtil\Enums.cs" />
-    <Compile Include="ProcUtil\Player.cs" />
     <Compile Include="ProcUtil\ProcessUtil.cs" />
-    <Compile Include="ProcUtil\RGsHarp.cs" />
-    <Compile Include="ProcUtil\ScriptCommands.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

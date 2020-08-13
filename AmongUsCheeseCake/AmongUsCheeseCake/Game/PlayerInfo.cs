@@ -21,8 +21,7 @@ namespace AmongUsCheeseCake.Game
 
         public static int SizeOf()
         {
-            var size = Marshal.SizeOf(typeof(PlayerInfo)); 
-            Console.WriteLine(size);
+            var size = Marshal.SizeOf(typeof(PlayerInfo));  
             return size;
         }
         public IntPtr test,test2;

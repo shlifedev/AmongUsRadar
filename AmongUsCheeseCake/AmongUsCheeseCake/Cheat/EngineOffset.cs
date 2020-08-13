@@ -6,8 +6,23 @@ using System.Text;
 
 namespace AmongUsCheeseCake.Cheat
 {
-    public sealed class PlayerControlPointer
+    public class EngineOffset
     {
-        public static IntPtr GetData = (IntPtr)0x516D5DF0;
+        public sealed class Pattern
+        { 
+            /// <summary>
+            /// Get PlayerControl Class 
+            /// </summary>
+            public static string PlayerControl = "E8 F5 4C 12 ?? ?? ?? ??"; 
+
+            /// <summary>
+            /// Get PlayerControl.Get_Data();
+            /// </summary>
+            public static string PlayerControl_GetData = "55 8B EC 80 3D 58 06 ??";
+        }
+        public sealed class PlayerControlPointer
+        {
+            public static IntPtr GetData = (IntPtr)0x516D5DF0;
+        }
     }
 }
