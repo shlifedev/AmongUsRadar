@@ -36,8 +36,7 @@ namespace AmongUsCheeseCake.Cheat
         public static Mem Memory = new Mem();
         public static MemorySharp MemorySharp;
         public static ProcessMemory ProcessMemory;
-        private string m_cached_gameDataOffset = null;
-
+        private string m_cached_gameDataOffset = null; 
         private List<CachedPlayerControllInfo> SearchedPlayerList = new List<CachedPlayerControllInfo>();
         public List<CachedPlayerControllInfo> RealPlayerInstance = new List<CachedPlayerControllInfo>();
         public int localNetworkID = 483328960;
@@ -45,7 +44,7 @@ namespace AmongUsCheeseCake.Cheat
         private Thread tickThread = null;
         private Thread radarThread = null;
 
-
+ 
 
 
         List<CachedPlayerControllInfo> SearchPlayersWithoutMine()
@@ -155,14 +154,14 @@ namespace AmongUsCheeseCake.Cheat
             {
                 var test = x.Instance.GetSyncPosition();
 
-                if (x.__updateSyncPosition.x == 0 && x.__updateSyncPosition.y == 0)
+                if (x.syncPos.x == 0 && x.syncPos.y == 0)
                 {
-                    x.__updateSyncPosition = test; 
+                    x.syncPos = test; 
                     continue;
                 }
                 else
                 {
-                    if ((x.__updateSyncPosition.x != test.x) || x.__updateSyncPosition.y != test.y)
+                    if ((x.syncPos.x != test.x) || x.syncPos.y != test.y)
                         x.isOther = true;  
                 }
             }

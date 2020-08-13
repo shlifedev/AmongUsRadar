@@ -18,10 +18,38 @@ namespace AmongUsCheeseCake.Cheat
         public PlayerControll Instance; 
         public bool isOther = false;
         public bool isMine; 
-        public Vector2 __updateSyncPosition = Vector2.Zero;  
+        public Vector2 syncPos = Vector2.Zero;
 
 
-    
+ 
+        private bool m_die_flag = false;
+
+        /// <summary>
+        /// Position, ColorID
+        /// </summary>
+        public System.Action<Vector2, byte> onDie;
+
+        public Vector2 Position
+        {
+            get
+            {
+                if (isMine) return Instance.GetMyPosition();
+                else
+                {
+                    return Instance.GetSyncPosition();
+                }
+            }
+        }
+
+
+        public void ObserveState()
+        {
+            if(m_die_flag == false && PlayerInfo.Value.IsDead == 1)
+            {
+                m_die_flag = true;
+                onDie?.Invoke(Position, PlayerInfo.Value.ColorId);
+            }
+        }
         private string playerInfoOffset = null;
         public PlayerInfo? PlayerInfo
         {
