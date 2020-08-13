@@ -207,7 +207,26 @@ namespace ProcessUtil
             WaitForSingleObject(hThread, 0xFFFFFFFF);
             GetExitCodeThread(hThread, out returnValue);
 
-            return (int) returnValue;
+            return (int)returnValue;
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        public struct RemoteThreadParams
+        {
+            [MarshalAs(UnmanagedType.I4)]
+            public int Param1;
+            [MarshalAs(UnmanagedType.I4)]
+            public int Param2;
+        }
+
+        public int CallFunction2(IntPtr functionPtr, IntPtr param)
+        { 
+            uint threadID;
+            uint returnValue = 0; 
+            IntPtr hThread = CreateRemoteThread(this.m_Handle, IntPtr.Zero, 0, functionPtr, param, 0, out threadID);
+            WaitForSingleObject(hThread, 0xFFFFFFFF);
+            GetExitCodeThread(hThread, out returnValue); 
+            return (int)returnValue;
         }
 
         /// <summary>
