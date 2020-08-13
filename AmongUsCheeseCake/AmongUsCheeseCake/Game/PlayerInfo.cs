@@ -9,28 +9,23 @@ namespace AmongUsCheeseCake.Game
 {
     [System.Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public struct S_PlayerInfo
+    public struct PlayerInfo
     {
-        public static S_PlayerInfo FromBytes(byte[] bytes)
+        public static PlayerInfo FromBytes(byte[] bytes)
         {
             GCHandle gcHandle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
-            var data = (S_PlayerInfo)Marshal.PtrToStructure(gcHandle.AddrOfPinnedObject(), typeof(S_PlayerInfo));
+            var data = (PlayerInfo)Marshal.PtrToStructure(gcHandle.AddrOfPinnedObject(), typeof(PlayerInfo));
             gcHandle.Free();
             return data;
-        }
-        public static List<S_PlayerInfo> FromBytesList(byte[] bytes)
-        {
-            GCHandle gcHandle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
-            var data = (List<S_PlayerInfo>)Marshal.PtrToStructure(gcHandle.AddrOfPinnedObject(), typeof(List<S_PlayerInfo>));
-            gcHandle.Free();
-            return data;
-        }
+        } 
 
         public static int SizeOf()
         {
-            var size = Marshal.SizeOf(typeof(S_PlayerInfo)); ;
+            var size = Marshal.SizeOf(typeof(PlayerInfo)); 
+            Console.WriteLine(size);
             return size;
-        } 
+        }
+        public IntPtr test,test2;
         public byte PlayerId;
         public UIntPtr PlayerName;
         public byte ColorId;

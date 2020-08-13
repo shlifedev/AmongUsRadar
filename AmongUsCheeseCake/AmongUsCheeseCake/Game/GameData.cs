@@ -9,19 +9,19 @@ namespace AmongUsCheeseCake.Game
 {
     [System.Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public class S_GameData : S_InnerNetObject
+    public class GameData : InnerNetObject
     {
-        public static S_GameData FromBytes(byte[] bytes)
+        public static GameData FromBytes(byte[] bytes)
         {
             GCHandle gcHandle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
-            var data = (S_GameData)Marshal.PtrToStructure(gcHandle.AddrOfPinnedObject(), typeof(S_GameData));
+            var data = (GameData)Marshal.PtrToStructure(gcHandle.AddrOfPinnedObject(), typeof(GameData));
             gcHandle.Free();
             return data;
         }
 
         public static int SizeOf()
         {
-            var size = Marshal.SizeOf(typeof(S_GameData)); ;
+            var size = Marshal.SizeOf(typeof(GameData)); ;
             return size;
         }
          

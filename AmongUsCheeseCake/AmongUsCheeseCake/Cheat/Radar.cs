@@ -90,6 +90,16 @@ public class RadarOverlay : IDisposable
 
     public float center = 0;
      
+
+    public Point GetRadarPosition(Vector2 pos)
+    {
+        var overlayX = (overlaySize/2) + (overlaySize * ((pos.x +center) / map_size));
+        var overlayY = (overlaySize/2) - (overlaySize * ((pos.y -center) / map_size));  
+        return new Point(overlayX, overlayY);
+    }
+
+    
+
     private void _window_DrawGraphics(object sender, DrawGraphicsEventArgs e)
     { 
         var gfx = e.Graphics;  
@@ -111,9 +121,7 @@ public class RadarOverlay : IDisposable
             else
             {
                 pos = x.Instance.GetMyPosition(); 
-            }
-            float overlayXPer = (pos.x +center) / map_size; 
-            float overlayYPer = (pos.y +center) / map_size;  
+            } 
             var overlayX = (overlaySize/2) + (overlaySize * ((pos.x +center) / map_size));
             var overlayY = (overlaySize/2) - (overlaySize * ((pos.y -center) / map_size));  
 

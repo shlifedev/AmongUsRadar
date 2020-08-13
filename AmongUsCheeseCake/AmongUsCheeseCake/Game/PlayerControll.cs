@@ -15,22 +15,21 @@ namespace AmongUsCheeseCake.Game
 
     [System.Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public struct S_PlayerControll
+    public struct PlayerControll
     {
  
 
-        public static S_PlayerControll FromBytes(byte[] bytes)
+        public static PlayerControll FromBytes(byte[] bytes)
         {
             GCHandle gcHandle = GCHandle.Alloc(bytes, GCHandleType.Pinned); 
-            var data = (S_PlayerControll)Marshal.PtrToStructure(gcHandle.AddrOfPinnedObject(), typeof(S_PlayerControll));
+            var data = (PlayerControll)Marshal.PtrToStructure(gcHandle.AddrOfPinnedObject(), typeof(PlayerControll));
             gcHandle.Free();
             return data;
         }
 
         public static int SizeOf()
         {
-            var size = Marshal.SizeOf(typeof(S_PlayerControll)); 
-            Console.WriteLine(size);
+            var size = Marshal.SizeOf(typeof(PlayerControll));  
             return size;
         } 
   

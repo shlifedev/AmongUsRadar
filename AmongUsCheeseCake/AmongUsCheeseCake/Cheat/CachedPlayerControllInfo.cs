@@ -15,7 +15,7 @@ namespace AmongUsCheeseCake.Cheat
     {
         public string offset;
         public IntPtr offset_ptr;
-        public S_PlayerControll Instance; 
+        public PlayerControll Instance; 
         public bool isOther = false;
         public bool isMine;
         public bool isImposter = false; 
@@ -23,7 +23,7 @@ namespace AmongUsCheeseCake.Cheat
         public void ReadMemory()
         {
             
-            Instance = S_PlayerControll.FromBytes(CheatBase.Memory.ReadBytes(offset, S_PlayerControll.SizeOf()));
+            Instance = PlayerControll.FromBytes(CheatBase.Memory.ReadBytes(offset, PlayerControll.SizeOf()));
             if(Instance.inVent == 1) 
                 isImposter = true;
         }
@@ -31,7 +31,7 @@ namespace AmongUsCheeseCake.Cheat
         #region
 
 
-        static IntPtr __getDataAddress = new IntPtr(0x54615DF0); 
+        static IntPtr __getDataAddress = new IntPtr(0x516D5DF0); 
         public IntPtr __getData()
         { 
             return CheatBase.MemorySharp.Assembly.Execute<IntPtr>(__getDataAddress, Binarysharp.MemoryManagement.Assembly.CallingConvention.CallingConventions.Thiscall, offset_ptr);

@@ -31,7 +31,7 @@ namespace AmongUsCheeseCake.Cheat
         [DllImport("user32.dll")]
         public static extern bool GetWindowRect(IntPtr hwnd, ref Rect rectangle);
 
-        static string PlayerControllPattern = "00 ED 5E 06 ?? ?? ?? ??";
+        static string PlayerControllPattern = "D8 03 A5 06 ?? ?? ?? ??";
         static string GameDataPattern = "A8 A4 B0 06 ?? ?? ?? ??";
 
         public static Mem Memory = new Mem();
@@ -58,8 +58,8 @@ namespace AmongUsCheeseCake.Cheat
             var results =    result.Result;
             foreach (var x in results)
             {
-                var bytes = Memory.ReadBytes(x.GetAddress(), S_PlayerControll.SizeOf());
-                var playerControll = S_PlayerControll.FromBytes(bytes);
+                var bytes = Memory.ReadBytes(x.GetAddress(), PlayerControll.SizeOf());
+                var playerControll = PlayerControll.FromBytes(bytes);
                 // 모든 플레이어의 공통 owner id
                 if (playerControll.OwnerId == 257 && playerControll.netId != 0)
                 {
@@ -80,17 +80,17 @@ namespace AmongUsCheeseCake.Cheat
         }
 
 
-        List<S_PlayerControll> SearchAllPlayerInstance()
+        List<PlayerControll> SearchAllPlayerInstance()
         {
 
-            List<S_PlayerControll> list = new List<S_PlayerControll>();
+            List<PlayerControll> list = new List<PlayerControll>();
             var result = Memory.AoBScan(PlayerControllPattern, true, true);
             result.Wait();
             var results =    result.Result;
             foreach (var x in results)
             {
-                var bytes = Memory.ReadBytes(x.GetAddress(), S_PlayerControll.SizeOf());
-                var playerControll = S_PlayerControll.FromBytes(bytes);
+                var bytes = Memory.ReadBytes(x.GetAddress(), PlayerControll.SizeOf());
+                var playerControll = PlayerControll.FromBytes(bytes);
                 list.Add(playerControll);
             }
             return list;
@@ -122,8 +122,8 @@ namespace AmongUsCheeseCake.Cheat
 
             foreach (var x in results)
             {
-                var bytes = Memory.ReadBytes(x.GetAddress(), S_GameData.SizeOf());
-                var gameData = S_GameData.FromBytes(bytes);
+                var bytes = Memory.ReadBytes(x.GetAddress(), GameData.SizeOf());
+                var gameData = GameData.FromBytes(bytes);
                 // OWNER ID가 -2이고, NetId가 4294967295가 아닌 객체는 실제 인스턴스이다.
                 // 4294967295(uint의 max값)은, 이미 인스턴스가 해제된 가비지값을 가리킴
                 if (gameData.OwnerId == -2 && gameData.NetId != 4294967295)
@@ -180,7 +180,7 @@ namespace AmongUsCheeseCake.Cheat
                 else
                 {
                     if ((x.__updateSyncPosition.x != test.x) || x.__updateSyncPosition.y != test.y)
-                        x.isOther = true; 
+                        x.isOther = true;  
                 }
             }
         }
@@ -226,11 +226,11 @@ namespace AmongUsCheeseCake.Cheat
         }
 
 
-        public S_GameData ReadGameData()
+        public GameData ReadGameData()
         {
             try
             {
-                return S_GameData.FromBytes(Memory.ReadBytes(m_cached_gameDataOffset, S_GameData.SizeOf()));
+                return GameData.FromBytes(Memory.ReadBytes(m_cached_gameDataOffset, GameData.SizeOf()));
             }
             catch
             {

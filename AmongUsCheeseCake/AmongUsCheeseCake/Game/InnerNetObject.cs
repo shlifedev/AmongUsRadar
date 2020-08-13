@@ -5,7 +5,7 @@ namespace AmongUsCheeseCake.Game
 {
 	[System.Serializable]
 	[StructLayout(LayoutKind.Sequential)]
-	public class S_InnerNetObject
+	public class InnerNetObject
 	{
 		public int Instance_Dummy, Instance2_Dummy;
 		public UIntPtr m_cachedPtr;
