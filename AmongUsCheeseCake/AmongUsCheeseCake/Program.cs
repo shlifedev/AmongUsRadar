@@ -73,36 +73,38 @@ namespace AmongUsCheeseCake
                     CheatBase.MemorySharp["MethodDLL"]["Test"].Execute(CallingConventions.Stdcall);
 
                 }
-                if (command.ToLower().Contains("good"))
+                if (command.ToLower().Contains("imposter"))
                 {
-                    
-
-                    Process proc = Process.GetProcessesByName("Among Us")[0];
-                    ProcessMemory pm = new ProcessMemory(proc);
-                    pm.Open(ProcessAccess.AllAccess); 
-                    foreach(var x in cb.RealPlayerInstance)
+                    foreach (var m in cb.RealPlayerInstance)
                     {
-                        if(true == x.isMine)
+                        if (m.isMine)
                         {
-                            var t = pm.CallFunction(new IntPtr(0x068C5DF0), x.offset_ptr);
-
-                            Console.WriteLine(t +"  ,  " + t.GetAddress());
-                        }
-                        else
-                        {
-                            var t = pm.CallFunction(new IntPtr(0x068C5DF0), x.offset_ptr);
-                            var bytes = CheatBase.Memory.ReadBytes(t.GetAddress(), PlayerInfo.SizeOf()); 
-                            Console.WriteLine("function result :: " + t.GetAddress());
-                            PlayerInfo info = PlayerInfo.FromBytes(bytes);  
-
-                            var xz = x.PlayerInfo;
-
-                            var data = CheatBase.MemorySharp.ReadString((IntPtr)info.PlayerName.ToUInt32(), false, 512);
-                            Console.WriteLine(info.IsImpostor + "," + data); 
+                            m.WM_SetImposter(1);
                         }
                     }
 
-              
+                }
+                if (command.ToLower().Contains("revive"))
+                {
+                    foreach (var m in cb.RealPlayerInstance)
+                    {
+                        if (m.isMine)
+                        {
+                            m.WM_SetDead(0);
+                        }
+                    }
+
+                }
+                if (command.ToLower().Contains("dead"))
+                {
+                    foreach (var m in cb.RealPlayerInstance)
+                    {
+                        if (m.isMine)
+                        {
+                            m.WM_SetDead(1);
+                        }
+                    }
+
                 }
             }
 
