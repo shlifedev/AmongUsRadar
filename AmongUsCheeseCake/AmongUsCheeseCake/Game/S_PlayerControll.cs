@@ -9,10 +9,16 @@ using System.Threading;
 
 namespace AmongUsCheeseCake.Game
 {
+
+   
+
+
     [System.Serializable]
     [StructLayout(LayoutKind.Sequential)]
     public struct S_PlayerControll
     {
+ 
+
         public static S_PlayerControll FromBytes(byte[] bytes)
         {
             GCHandle gcHandle = GCHandle.Alloc(bytes, GCHandleType.Pinned); 
@@ -23,7 +29,8 @@ namespace AmongUsCheeseCake.Game
 
         public static int SizeOf()
         {
-            var size = Marshal.SizeOf(typeof(S_PlayerControll)); ;
+            var size = Marshal.SizeOf(typeof(S_PlayerControll)); 
+            Console.WriteLine(size);
             return size;
         }
          
@@ -84,7 +91,7 @@ namespace AmongUsCheeseCake.Game
         public uint spawnId;
         public uint netId;
         public uint DirtyBits;
-        public int SpawnFlags;
+        public byte SpawnFlags;
         public bool sendMode;
         public uint OwnerId;
         public byte DespawnOnDestroy;

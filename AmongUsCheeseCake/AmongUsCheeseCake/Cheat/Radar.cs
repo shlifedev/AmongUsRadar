@@ -110,7 +110,7 @@ public class RadarOverlay : IDisposable
             }
             else
             {
-                pos = x.Instance.GetMyPosition();
+                pos = x.Instance.GetMyPosition(); 
             }
             float overlayXPer = (pos.x +center) / map_size; 
             float overlayYPer = (pos.y +center) / map_size;  

@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AmongUsCheeseCake.Cheat;
 using AmongUsCheeseCake.Game;
+using Binarysharp.MemoryManagement.Assembly.CallingConvention;
 using Memory;
 namespace AmongUsCheeseCake
 {
@@ -47,8 +48,28 @@ namespace AmongUsCheeseCake
                 if (command.ToLower().Contains("center"))
                 {
                     var x = command.Split(' ');
-                    var size = int.Parse(x[1]); 
+                    var size = int.Parse(x[1]);
                     cb.radar.center = size;
+                }
+                if (command.ToLower().Contains("soundmanager"))
+                {
+                    var x = CheatBase.MemorySharp.Assembly.Execute(new IntPtr(0x5161EED0), CallingConventions.Stdcall);
+                    Console.WriteLine("SoundManager PTR => " + x);
+                    CheatBase.MemorySharp.Assembly.Execute(x, CallingConventions.Thiscall, new IntPtr(0x5161D760), 0);
+                }
+                if (command.ToLower().Contains("inject"))
+                {
+                    CheatBase.MemorySharp.Modules.Inject(@"C:\Users\shlif\OneDrive\Documents\GitHub\AmongUsCheat\AmongUsCheeseCake\Release\MethodDLL.dll");
+                }
+                if (command.ToLower().Contains("eject"))
+                {
+                    CheatBase.MemorySharp.Modules.Eject("MethodDLL");
+                    Console.WriteLine("method dll eject!");
+                } 
+                if (command.ToLower().Contains("test"))
+                {
+                    CheatBase.MemorySharp["MethodDLL"]["Test"].Execute(CallingConventions.Stdcall);
+
                 }
             }
 

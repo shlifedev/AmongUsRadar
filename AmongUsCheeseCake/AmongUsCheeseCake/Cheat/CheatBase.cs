@@ -1,5 +1,6 @@
 ﻿
 using AmongUsCheeseCake.Game;
+using Binarysharp.MemoryManagement;
 using Memory;
 using System;
 using System.Collections.Generic;
@@ -30,18 +31,16 @@ namespace AmongUsCheeseCake.Cheat
         [DllImport("user32.dll")]
         public static extern bool GetWindowRect(IntPtr hwnd, ref Rect rectangle);
 
-        static string PlayerControllPattern = "B0 45 D4 0F ?? ?? ?? ??";
+        static string PlayerControllPattern = "00 ED 5E 06 ?? ?? ?? ??";
         static string GameDataPattern = "A8 A4 B0 06 ?? ?? ?? ??";
 
         public static Mem Memory = new Mem();
-
-
-
+        public static MemorySharp MemorySharp;
 
         private string m_cached_gameDataOffset = null;
 
-        private List<CachedPlayerControllInfo> SearchedPlayerList = new List<CachedPlayerControllInfo>();  
-        public List<CachedPlayerControllInfo> RealPlayerInstance = new List<CachedPlayerControllInfo>(); 
+        private List<CachedPlayerControllInfo> SearchedPlayerList = new List<CachedPlayerControllInfo>();
+        public List<CachedPlayerControllInfo> RealPlayerInstance = new List<CachedPlayerControllInfo>();
         public int localNetworkID = 483328960;
         public RadarOverlay radar;
         private Thread tickThread = null;
@@ -65,9 +64,11 @@ namespace AmongUsCheeseCake.Cheat
                 if (playerControll.OwnerId == 257 && playerControll.netId != 0)
                 {
                     Console.WriteLine("add Players :: " + playerControll.PlayerId);
-                    list.Add(new CachedPlayerControllInfo() {
+                    list.Add(new CachedPlayerControllInfo()
+                    {
                         Instance = playerControll,
-                        offset = x.GetAddress()
+                        offset = x.GetAddress(),
+                        offset_ptr = new IntPtr((int)x)
                     });
                 }
                 else
@@ -89,23 +90,23 @@ namespace AmongUsCheeseCake.Cheat
             foreach (var x in results)
             {
                 var bytes = Memory.ReadBytes(x.GetAddress(), S_PlayerControll.SizeOf());
-                var playerControll = S_PlayerControll.FromBytes(bytes); 
-                list.Add(playerControll); 
+                var playerControll = S_PlayerControll.FromBytes(bytes);
+                list.Add(playerControll);
             }
             return list;
         }
 
-         
+
         void FindAllRealPlayerInstance()
         {
             RealPlayerInstance.Clear();
             foreach (var x in SearchedPlayerList)
             {
-                var vec2 = x.Instance.GetSyncPosition(); 
+                var vec2 = x.Instance.GetSyncPosition();
                 RealPlayerInstance.Add(x);
             }
         }
-         
+
 
 
 
@@ -133,7 +134,9 @@ namespace AmongUsCheeseCake.Cheat
 
         public void Init()
         {
+     
             var b = Memory.OpenProcess("Among Us");
+            MemorySharp = new MemorySharp(Memory.GetProcIdFromName("Among Us")); 
             if (b)
             {
                 if (tickThread != null)
@@ -141,22 +144,22 @@ namespace AmongUsCheeseCake.Cheat
                     tickThread.Abort();
                     tickThread = null;
                     Console.WriteLine("thread suspend..");
-                } 
+                }
 
- 
-                if(tickThread == null)
+
+                if (tickThread == null)
                     tickThread = new Thread(Tick);
 
                 if (radarThread == null)
-                    radarThread = new Thread(Radar); 
-                this.RealPlayerInstance.Clear(); 
-                this.SearchedPlayerList.Clear(); 
+                    radarThread = new Thread(Radar);
+                this.RealPlayerInstance.Clear();
+                this.SearchedPlayerList.Clear();
 
 
-                
+
                 tickThread.Start();
-                if(radarThread.ThreadState == System.Threading.ThreadState.Unstarted)
-                   radarThread.Start();
+                if (radarThread.ThreadState == System.Threading.ThreadState.Unstarted)
+                    radarThread.Start();
             }
         }
 
@@ -164,22 +167,22 @@ namespace AmongUsCheeseCake.Cheat
         /// 로깅 테스트
         /// </summary>
         public void UpdatePlayerPosition()
-        {  
+        {
             foreach (var x in RealPlayerInstance)
             {
                 var test = x.Instance.GetSyncPosition();
 
-                if(x.__updateSyncPosition.x == 0 && x.__updateSyncPosition.y == 0)
+                if (x.__updateSyncPosition.x == 0 && x.__updateSyncPosition.y == 0)
                 {
-                    x.__updateSyncPosition = test;
+                    x.__updateSyncPosition = test; 
                     continue;
                 }
                 else
                 {
                     if ((x.__updateSyncPosition.x != test.x) || x.__updateSyncPosition.y != test.y)
-                        x.isOther = true;
-                } 
-            } 
+                        x.isOther = true; 
+                }
+            }
         }
 
 
@@ -189,16 +192,16 @@ namespace AmongUsCheeseCake.Cheat
 
         }
         public void Tick()
-        { 
-            Console.WriteLine("Start Tick Thread!"); 
+        {
+            Console.WriteLine("Start Tick Thread!");
             SearchedPlayerList = SearchPlayersWithoutMine();
-            FindAllRealPlayerInstance(); 
+            FindAllRealPlayerInstance();
 
             var proc = Process.GetProcessesByName("Among Us");
             bool test_rect = false;
-            if(proc != null)
-            { 
-             
+            if (proc != null)
+            {
+
             }
             while (true)
             {
@@ -211,7 +214,7 @@ namespace AmongUsCheeseCake.Cheat
                     radar.SetWindowPos(rect.Left + 10, rect.Top + 30);
                 }
                 UpdatePlayerPosition();
-                System.Threading.Thread.Sleep(10); 
+                System.Threading.Thread.Sleep(10);
             }
         }
         public void Radar()
