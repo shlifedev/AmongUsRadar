@@ -18,6 +18,9 @@
   - 2D Radar Latest Died Position
  
  
+  - (Command) Set Imposter
+  - (Command) Reset Dead Condition
+ 
  # Soon
   - 2D ESP
   - 2D Radar Map(Image)
