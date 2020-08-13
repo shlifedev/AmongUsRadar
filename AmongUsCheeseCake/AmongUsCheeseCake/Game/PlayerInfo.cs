@@ -11,6 +11,7 @@ namespace AmongUsCheeseCake.Game
     [StructLayout(LayoutKind.Sequential)]
     public struct PlayerInfo
     {
+
         public static PlayerInfo FromBytes(byte[] bytes)
         {
             GCHandle gcHandle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
@@ -24,6 +25,7 @@ namespace AmongUsCheeseCake.Game
             var size = Marshal.SizeOf(typeof(PlayerInfo));    
             return size;
         }
+        
         public IntPtr test,test2;
         public byte PlayerId;
         public UIntPtr PlayerName;

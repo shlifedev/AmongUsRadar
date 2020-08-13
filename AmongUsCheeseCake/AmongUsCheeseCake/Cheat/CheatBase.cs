@@ -183,8 +183,7 @@ namespace AmongUsCheeseCake.Cheat
             } 
             if (cnt == RealPlayerInstance.Count-1)
             {
-                pc.isMine = true;
-                pc.isOther = false;
+                pc.isMine = true; 
             }
         }
 
