@@ -13,6 +13,9 @@
  
  # Feature
   - 2D Radar
+  - 2D Radar Player Color
+  - 2D Radar Imposter
+  - 2D Radar DeadBody
  
  # Soon
   - 2D ESP
