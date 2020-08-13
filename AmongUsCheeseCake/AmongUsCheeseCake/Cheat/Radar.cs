@@ -70,6 +70,22 @@ public class RadarOverlay : IDisposable
         _brushes["random"] = gfx.CreateSolidBrush(0, 0, 0);
         _brushes["black 50%"] = gfx.CreateSolidBrush(0, 0, 0, 0.5f);
 
+
+
+        _brushes["player_color_0"] = gfx.CreateSolidBrush(255, 0, 0);
+        _brushes["player_color_1"] = gfx.CreateSolidBrush(0, 051, 204);
+        _brushes["player_color_2"] = gfx.CreateSolidBrush(0, 102, 0);
+        _brushes["player_color_3"] = gfx.CreateSolidBrush(255, 0, 204);
+        _brushes["player_color_4"] = gfx.CreateSolidBrush(255, 102, 51);
+        _brushes["player_color_5"] = gfx.CreateSolidBrush(255, 255, 051);
+        _brushes["player_color_6"] = gfx.CreateSolidBrush(51, 51, 51);
+        _brushes["player_color_7"] = gfx.CreateSolidBrush(255, 255, 255);
+        _brushes["player_color_8"] = gfx.CreateSolidBrush(102, 0, 153);
+        _brushes["player_color_9"] = gfx.CreateSolidBrush(102, 51, 0);
+        _brushes["player_color_10"] = gfx.CreateSolidBrush(51, 255, 255);
+        _brushes["player_color_11"] = gfx.CreateSolidBrush(0, 255, 0);
+
+
         if (e.RecreateResources)
             return;
 
@@ -98,7 +114,7 @@ public class RadarOverlay : IDisposable
         return new Point(overlayX, overlayY);
     }
 
-    
+ 
 
     private void _window_DrawGraphics(object sender, DrawGraphicsEventArgs e)
     { 
@@ -114,28 +130,33 @@ public class RadarOverlay : IDisposable
               
                     
 
-            if (x.isOther && x.isMine == false)
-            {
-                playerBrush = _brushes["red"];
-                pos = x.Instance.GetSyncPosition();
-            }
-            else if(x.isMine )
-            {
+            if (x.isOther && x.isMine == false) 
+                pos = x.Instance.GetSyncPosition(); 
+            else if(x.isMine ) 
                 pos = x.Instance.GetMyPosition();
-                playerBrush = _brushes["green"];
-            } 
+
+            playerBrush = _brushes[$"player_color_{x.PlayerInfo.Value.ColorId}"];
+
             var overlayX = (overlaySize/2) + (overlaySize * ((pos.x +center) / map_size));
             var overlayY = (overlaySize/2) - (overlaySize * ((pos.y -center) / map_size));  
 
-            x.ReadMemory(); 
-             
-            if(x.PlayerInfo.Value.IsImpostor)
-                gfx.DrawText(_fonts["arial_small"], _brushes["white"], new Point(overlayX, overlayY - 5), "임포스터");
+            x.ReadMemory();
+
+            if (x.PlayerInfo.Value.IsImpostor)
+            {
+                gfx.DrawText(_fonts["arial_small"], _brushes["red"], new Point(overlayX, overlayY - 5), "임포스터");
+              
+            }
+            else
+            {
+               // gfx.DrawText(_fonts["arial_small"], _brushes["white"], new Point(overlayX, overlayY - 5), "유령");
+            }
+            gfx.DrawText(_fonts["arial_small"], _brushes["red"], new Point(overlayX, overlayY - 5), x.PlayerInfo.Value.ColorId.ToString());
 
 
 
             gfx.DrawText(_fonts["arial_small"], _brushes["white"], new Point(overlayX, overlayY - 15), $"{pos.x.ToString("0.0")},{pos.y.ToString("0.0")}");
-            gfx.FillCircle(playerBrush, overlayX - 2, overlayY - 2, 2);
+            gfx.FillCircle(playerBrush, overlayX - 2, overlayY - 2, 4);
             gfx.DrawText(_fonts["arial_small"], _brushes["white"], new Point(overlayX, overlayY), x.Instance.PlayerId.ToString());  
         }
     }

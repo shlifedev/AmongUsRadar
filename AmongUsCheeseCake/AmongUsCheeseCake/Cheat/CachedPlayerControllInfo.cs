@@ -48,7 +48,9 @@ namespace AmongUsCheeseCake.Cheat
                 {
                     PlayerInfo pInfo = Game.PlayerInfo.FromBytes(CheatBase.Memory.ReadBytes(playerInfoOffset, Game.PlayerInfo.SizeOf()));
                     this.m_pInfo = pInfo; 
-                } 
+                }
+
+
                 return m_pInfo;
             }
         }
