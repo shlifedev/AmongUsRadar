@@ -21,7 +21,7 @@ namespace AmongUsCheeseCake.Game
 
         public static int SizeOf()
         {
-            var size = Marshal.SizeOf(typeof(PlayerInfo));  
+            var size = Marshal.SizeOf(typeof(PlayerInfo));    
             return size;
         }
         public IntPtr test,test2;
@@ -31,10 +31,10 @@ namespace AmongUsCheeseCake.Game
         public uint HatId;
         public uint PetId;
         public uint SkinId;
-        public bool Disconnected;
+        public byte Disconnected;
         public UIntPtr Tasks;
-        public bool IsImpostor;
-        public bool IsDead;
+        public byte IsImpostor;
+        public byte IsDead;
         private UIntPtr _object;
     }
 }

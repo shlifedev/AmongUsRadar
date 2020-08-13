@@ -142,22 +142,18 @@ public class RadarOverlay : IDisposable
 
             x.ReadMemory();
 
-            if (x.PlayerInfo.Value.IsImpostor)
+            if (x.PlayerInfo.Value.IsImpostor == 1)
             {
                 gfx.DrawText(_fonts["arial_small"], _brushes["red"], new Point(overlayX, overlayY - 5), "임포스터");
-              
             }
-            else
+            if (x.PlayerInfo.Value.IsDead == 1)
             {
-               // gfx.DrawText(_fonts["arial_small"], _brushes["white"], new Point(overlayX, overlayY - 5), "유령");
-            }
-            gfx.DrawText(_fonts["arial_small"], _brushes["red"], new Point(overlayX, overlayY - 5), x.PlayerInfo.Value.ColorId.ToString());
-
-
+                gfx.DrawText(_fonts["arial_small"], _brushes["red"], new Point(overlayX, overlayY + 5), "죽음");
+            } 
+           
 
             gfx.DrawText(_fonts["arial_small"], _brushes["white"], new Point(overlayX, overlayY - 15), $"{pos.x.ToString("0.0")},{pos.y.ToString("0.0")}");
-            gfx.FillCircle(playerBrush, overlayX - 2, overlayY - 2, 4);
-            gfx.DrawText(_fonts["arial_small"], _brushes["white"], new Point(overlayX, overlayY), x.Instance.PlayerId.ToString());  
+            gfx.FillCircle(playerBrush, overlayX - 2, overlayY - 2, 4); 
         }
     }
  
