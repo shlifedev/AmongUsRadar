@@ -201,7 +201,7 @@ namespace AmongUsCheeseCake.Cheat
 
             var proc = Process.GetProcessesByName("Among Us");
 
-            bool test_rect = false;
+            bool test_rect = true;
             if (proc != null)
             {
 
@@ -214,7 +214,7 @@ namespace AmongUsCheeseCake.Cheat
                     IntPtr ptr = lol.MainWindowHandle;
                     Rect rect = new Rect();
                     GetWindowRect(ptr, ref rect);
-                    radar.SetWindowPos(rect.Left + 10, rect.Top + 30);
+                    radar.SetWindowPos(rect.Left + 9, rect.Top + 31);
                 }
                 UpdatePlayerPosition();
                 System.Threading.Thread.Sleep(10);
