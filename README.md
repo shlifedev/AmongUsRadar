@@ -21,13 +21,14 @@
   - Method Hook
   
   
- # Memo
-
- ## CreateRemoteThread Multi Param for c# 
+ ## Memo
+  개발로그
+  
+ ### CreateRemoteThread Multi Param for c# 
     https://stackoverflow.com/questions/25354393/passing-multiple-parameters-using-createremotethread-in-c-sharp
     구조체를 Marshaling 한다음 포인터를 인자로 보낸다. 
     
- ## 지도대응 
+ ### 지도대응 
  
    지도 기준 좌표를 대응시키기위해 왼쪽 최상단 게임좌표, 우측 최하단 게임좌표를 구한후
    지도의 이미지 크기 비율에 맞춰서 매칭시킨다.
