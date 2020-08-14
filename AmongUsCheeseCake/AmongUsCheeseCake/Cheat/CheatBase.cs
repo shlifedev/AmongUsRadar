@@ -117,8 +117,9 @@ namespace AmongUsCheeseCake.Cheat
             Process proc = Process.GetProcessesByName("Among Us")[0];
             ProcessMemory = new ProcessMemory(proc);
             ProcessMemory.Open(ProcessAccess.AllAccess);
+   
 
-
+             
             if (b)
             {
                 if (tickThread != null)
@@ -128,6 +129,11 @@ namespace AmongUsCheeseCake.Cheat
                     Console.WriteLine("thread suspend..");
                 }
 
+                Thread t = new Thread(()=>{
+                    CheatWindow.Instance.Run();
+                });
+
+                t.Start();
 
                 if (tickThread == null)
                     tickThread = new Thread(Tick);
@@ -201,7 +207,7 @@ namespace AmongUsCheeseCake.Cheat
 
             }
             while (true)
-            {
+            { 
                 if (test_rect)
                 {
                     if(MemorySharp.Windows.MainWindow.IsActivated)
@@ -212,6 +218,8 @@ namespace AmongUsCheeseCake.Cheat
                         GetWindowRect(ptr, ref rect);
                         RadarOverlay.Instance.SetWindowPos(rect.Left + 9, rect.Top + 31);
                         RadarOverlay.Instance.drawDisable = false;
+                        CheatWindow.Instance.SdlWindow.X = rect.Right - CheatWindow.Instance.SdlWindow.Width;
+                        CheatWindow.Instance.SdlWindow.Y = rect.Top; 
                     }
                     else
                     {

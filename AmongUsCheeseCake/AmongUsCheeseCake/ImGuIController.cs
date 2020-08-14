@@ -237,8 +237,7 @@ namespace ImGuiNET
             using (Stream s = assembly.GetManifestResourceStream(resourceName))
             {
                 if (s == null)
-                {
-                    Console.WriteLine(resourceName);
+                { 
                     using (Stream ss = File.Open($"Shaders/HLSL/{resourceName}", FileMode.Open))
                     {
                         byte[] ret = new byte[ss.Length];

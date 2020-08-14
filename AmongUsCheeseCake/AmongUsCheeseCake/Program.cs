@@ -13,47 +13,57 @@ namespace AmongUsCheeseCake
 
     public class CheatWindow
     {
-        private static Sdl2Window _sdlWindow;
-        private static GraphicsDevice _graphicsDriver;
-        private static ImGuiController _controller;
-        private static CommandList _cl;
-        private static Vector3 _clearColor = new Vector3(0.45f, 0.55f, 0.6f);
+        public static CheatWindow Instance
+        {
+            get
+            {
+                if(m_Instance == null) 
+                    m_Instance = new CheatWindow(); 
+                return m_Instance;
+            }
+        }
+
+        public  Sdl2Window SdlWindow { get => _sdlWindow; set => _sdlWindow = value; }
+
+        private static CheatWindow m_Instance;
+        private Sdl2Window _sdlWindow;
+        private GraphicsDevice _graphicsDriver;
+        private ImGuiController _controller;
+        private CommandList _cl;
+        private Vector3 _clearColor = new Vector3(0.2f, 0.2f, 0.2f);
         public void Run()
         {
-            VeldridStartup.CreateWindowAndGraphicsDevice(
-                   new WindowCreateInfo(50, 50, 500, 500, WindowState.Normal, "ImGui.NET Sample Program"),
-                   new GraphicsDeviceOptions(true, null, true),
-                   out _sdlWindow,
-                   out _graphicsDriver);
-            _sdlWindow.Resized += () =>
-            {
-                _graphicsDriver.MainSwapchain.Resize((uint)_sdlWindow.Width, (uint)_sdlWindow.Height);
-                _controller.WindowResized(_sdlWindow.Width, _sdlWindow.Height);
-            };
-
-            _sdlWindow.BorderVisible = false;
-            
-            _cl = _graphicsDriver.ResourceFactory.CreateCommandList();
-            _controller = new ImGuiController(_graphicsDriver, _graphicsDriver.MainSwapchain.Framebuffer.OutputDescription, _sdlWindow.Width, _sdlWindow.Height);
         
-            while (_sdlWindow.Exists)
+            SdlWindow = new Sdl2Window("",50,50,200,400,SDL_WindowFlags.AlwaysOnTop, true);
+            _graphicsDriver = VeldridStartup.CreateDefaultD3D11GraphicsDevice(new GraphicsDeviceOptions() { 
+            
+            }, SdlWindow);
+            SdlWindow.Resized += () =>
             {
-                InputSnapshot snapshot = _sdlWindow.PumpEvents();
-                if (!_sdlWindow.Exists) { break; }
+                _graphicsDriver.MainSwapchain.Resize((uint)SdlWindow.Width, (uint)SdlWindow.Height);
+                _controller.WindowResized(SdlWindow.Width, SdlWindow.Height);
+            }; 
+            SdlWindow.BorderVisible = false; 
+            _cl = _graphicsDriver.ResourceFactory.CreateCommandList();
+            _controller = new ImGuiController(_graphicsDriver, _graphicsDriver.MainSwapchain.Framebuffer.OutputDescription, SdlWindow.Width, SdlWindow.Height);
+            SdlWindow.Opacity = 0.85f;
+            while (SdlWindow.Exists)
+            {
+                InputSnapshot snapshot = SdlWindow.PumpEvents();
+                if (!SdlWindow.Exists) { break; }
                 _controller.Update(1f / 60f, snapshot); // Feed the input events to our ImGui controller, which passes them through to ImGui.
 
                 SubmitUI();
 
                 _cl.Begin();
                 _cl.SetFramebuffer(_graphicsDriver.MainSwapchain.Framebuffer);
-                _cl.ClearColorTarget(0, new RgbaFloat(_clearColor.X, _clearColor.Y, _clearColor.Z, 1f));
+                _cl.ClearColorTarget(0, new RgbaFloat(_clearColor.X, _clearColor.Y, _clearColor.Z, 0.5f));
                 _controller.Render(_graphicsDriver, _cl);
                 _cl.End();
                 _graphicsDriver.SubmitCommands(_cl);
                 _graphicsDriver.SwapBuffers(_graphicsDriver.MainSwapchain);
             }
-
-            // Clean up Veldrid resources
+             
             _graphicsDriver.WaitForIdle();
             _controller.Dispose();
             _cl.Dispose();
@@ -61,12 +71,7 @@ namespace AmongUsCheeseCake
         }
 
         private static unsafe void SubmitUI()
-        {
-            // Demo code adapted from the official Dear ImGui demo program:
-            // https://github.com/ocornut/imgui/blob/master/examples/example_win32_directx11/main.cpp#L172
-
-            // 1. Show a simple window.
-            // Tip: if we don't call ImGui.BeginWindow()/ImGui.EndWindow() the widgets automatically appears in a window called "Debug".
+        {  
             {
                 ImGui.SetNextWindowSize(new Vector2(500, 500), ImGuiCond.Appearing); 
                 ImGui.Begin("", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize |ImGuiWindowFlags.NoMove);
@@ -75,10 +80,12 @@ namespace AmongUsCheeseCake
                 ImGui.Text($"Mouse position: {ImGui.GetMousePos()}");
 
               
-                if (ImGui.Button("Button"))                                         // Buttons return true when clicked (NB: most widgets return true when edited/activated)
-                {
+                var xx = ImGui.IsKeyDown('A'); 
+                Console.WriteLine(xx); 
+                    if (ImGui.Button("Button"))                                  
+                    {
 
-                }
+                    } 
                 float framerate = ImGui.GetIO().Framerate;
                 ImGui.Text($"Application average {1000.0f / framerate:0.##} ms/frame ({framerate:0.#} FPS)");
             }
@@ -92,14 +99,15 @@ namespace AmongUsCheeseCake
 /// 가이드 : 킬타이머 offset찾은이후 offset -44 = base Position => monodissert에서 pBase찾기
 /// </summary>
 public class Program
-{
-
+{ 
+    [STAThread]
     static void Main(string[] args)
     {
 
+       
         CheatBase.Instance.Init();
-        CheatWindow t = new CheatWindow();
-        t.Run();
+        
+      
         while (true)
         {
             var command = Console.ReadLine();
