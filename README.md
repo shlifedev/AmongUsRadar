@@ -19,7 +19,7 @@
   - Filter & Show Dead Player
   - Filter & Show Imposter
   - Method Hook
-  
+  - GUI
   
  ## Memo
   개발로그
