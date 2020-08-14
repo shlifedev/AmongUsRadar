@@ -209,20 +209,20 @@ namespace AmongUsCheeseCake.Cheat
             while (true)
             { 
                 if (test_rect)
-                {
-                    if(MemorySharp.Windows.MainWindow.IsActivated)
+                { 
+                    if (MemorySharp.Windows.MainWindow.IsActivated)
                     {
                         Process lol = proc[0];
                         IntPtr ptr = lol.MainWindowHandle;
                         Rect rect = new Rect();
                         GetWindowRect(ptr, ref rect);
                         RadarOverlay.Instance.SetWindowPos(rect.Left + 9, rect.Top + 31);
-                        RadarOverlay.Instance.drawDisable = false;
-                        CheatWindow.Instance.SdlWindow.X = rect.Right - CheatWindow.Instance.SdlWindow.Width;
+                        RadarOverlay.Instance.drawDisable = false; 
+                        CheatWindow.Instance.SdlWindow.X = rect.Right;
                         CheatWindow.Instance.SdlWindow.Y = rect.Top; 
                     }
                     else
-                    {
+                    { 
                         RadarOverlay.Instance.drawDisable = true;
                     } 
                 }

@@ -34,7 +34,7 @@ namespace AmongUsCheeseCake
         public void Run()
         {
         
-            SdlWindow = new Sdl2Window("",50,50,200,400,SDL_WindowFlags.AlwaysOnTop, true);
+            SdlWindow = new Sdl2Window("",50,50,200,400, SDL_WindowFlags.AlwaysOnTop, true);
             _graphicsDriver = VeldridStartup.CreateDefaultD3D11GraphicsDevice(new GraphicsDeviceOptions() { 
             
             }, SdlWindow);
@@ -71,21 +71,51 @@ namespace AmongUsCheeseCake
         }
 
         private static unsafe void SubmitUI()
-        {  
+        {
             {
-                ImGui.SetNextWindowSize(new Vector2(500, 500), ImGuiCond.Appearing); 
-                ImGui.Begin("", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize |ImGuiWindowFlags.NoMove);
+                ImGui.SetNextWindowSize(new Vector2(200, 400), ImGuiCond.Appearing);
+                ImGui.Begin("", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove);
                 ImGui.SetWindowPos(new Vector2(0,0)); 
-                ImGui.Text("Hello, world!");
-                ImGui.Text($"Mouse position: {ImGui.GetMousePos()}");
-
+                ImGui.Text("by shlifedev@gmail.com"); 
               
-                var xx = ImGui.IsKeyDown('A'); 
-                Console.WriteLine(xx); 
-                    if (ImGui.Button("Button"))                                  
-                    {
+                var xx = ImGui.IsKeyDown('A');
+                
+                if (ImGui.Button("Change Imposter State"))
+                {
 
-                    } 
+                    foreach (var m in CheatBase.Instance.RealPlayerInstance)
+                    {
+                        if (m.isMine)
+                        {
+                            if(m.PlayerInfo.Value.IsImpostor == 0)
+                            {
+                                m.WriteMemory_Imposter(1);
+                            }
+                            else
+                            {
+                                m.WriteMemory_Imposter(0);
+                            }
+                       
+                        }
+                    }
+                } 
+                if (ImGui.Button("Change Dead State"))
+                {
+                    foreach (var m in CheatBase.Instance.RealPlayerInstance)
+                    {
+                        if (m.isMine)
+                        {
+                            if (m.PlayerInfo.Value.IsDead == 0)
+                            {
+                                m.WriteMemory_IsDead(1);
+                            }
+                            else
+                            {
+                                m.WriteMemory_IsDead(0);
+                            }
+                        }
+                    }
+                }
                 float framerate = ImGui.GetIO().Framerate;
                 ImGui.Text($"Application average {1000.0f / framerate:0.##} ms/frame ({framerate:0.#} FPS)");
             }
