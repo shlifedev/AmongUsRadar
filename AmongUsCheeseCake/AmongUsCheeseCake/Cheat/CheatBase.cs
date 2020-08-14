@@ -237,10 +237,16 @@ namespace AmongUsCheeseCake.Cheat
                     }
               
                 }
+
+
                 UpdatePlayerPosition();
-                System.Threading.Thread.Sleep(10);
+                foreach(var x in RealPlayerInstance)
+                {
+                    x.ObserveState();
+                }
 
 
+                System.Threading.Thread.Sleep(10); 
             }
         }
         public void Radar()

@@ -124,7 +124,7 @@ public class RadarOverlay : IDisposable
     public float center = 0;
 
 
-    public Point GetRadarPosition(Vector2 pos)
+    public Point Vec2ToOverlayPos(Vector2 pos)
     {
         var overlayX = (overlaySize/2) + (overlaySize * ((pos.x +center) / map_size));
         var overlayY = (overlaySize/2) - (overlaySize * ((pos.y -center) / map_size));
@@ -154,7 +154,57 @@ public class RadarOverlay : IDisposable
         }
     }
 
-     
+
+
+    public void RenderPlayer(Graphics gfx, CachedPlayerControllInfo player)
+    {
+        var pInfo = player.PlayerInfo.Value;
+        if (pInfo.IsDead == 0)
+        {
+            SolidBrush playerInstanceBrush =  _brushes[$"player_color_{pInfo.ColorId}"];
+            var overlayPosition = Vec2ToOverlayPos(player.Position);
+            gfx.FillCircle(playerInstanceBrush, overlayPosition.X, overlayPosition.Y, 4);
+
+            if (pInfo.IsImpostor == 1) 
+                gfx.DrawText(_fonts["arial_small"], _brushes["red"], new Point(overlayPosition.X, overlayPosition.Y - 5), "Imposter"); 
+        } 
+    }
+    public void RenderDeadBody(Graphics gfx, CachedPlayerControllInfo player)
+    {
+        var pInfo = player.PlayerInfo.Value;
+        Vector2 diePos = Vector2.Zero;
+        var b = _diedPlayersMap.TryGetValue(pInfo.ColorId, out diePos);
+        if(b)
+        {
+            SolidBrush circleBrush = _brushes[$"player_color_{pInfo.ColorId}_dead"];
+            var overlayPoint = Vec2ToOverlayPos(diePos);
+            gfx.FillCircle(circleBrush, overlayPoint.X, overlayPoint.Y, 5);
+            gfx.DrawText(_fonts["arial_small"], _brushes["red"], new Point(overlayPoint.X, overlayPoint.Y + 5), $"죽음");
+        }  
+    }
+
+    public void DrawCreatorInfo(Graphics gfx)
+    {
+        gfx.FillRectangle(_brushes["black 50%"], new Rectangle(0, 0, overlaySize, 15));
+        gfx.DrawText(_fonts["consolas-mid"], _brushes["green"], new Point(0, 0), " 2D Radar | Coder by : 에비츄(shlifedev)");
+    }
+
+    public void DrawPlayerCount(Graphics gfx)
+    {
+        gfx.DrawText(_fonts["consolas"], _brushes["white"], new Point(0, overlaySize - 36), " Player Count : " + CheatBase.Instance.RealPlayerInstance.Count);
+
+        string imposters = null;
+        foreach (var playerInstance in CheatBase.Instance.RealPlayerInstance)
+        {
+            PlayerInfo value = playerInstance.PlayerInfo.Value;
+            if (value.IsImpostor == 1)
+            {
+                imposters += ((ColorID)value.ColorId).ToString() + "  ";
+            }
+        }
+
+       gfx.DrawText(_fonts["consolas"], _brushes["green"], new Point(0, overlaySize - 18), $" Imposter : {imposters}"); 
+    }
     private void _window_DrawGraphics(object sender, DrawGraphicsEventArgs e)
     {
         if (_fullInit == false)
@@ -162,54 +212,21 @@ public class RadarOverlay : IDisposable
             Init();
         }
         var gfx = e.Graphics;
-        gfx.ClearScene(_brushes["black 50%"]);
-        gfx.FillRectangle(_brushes["black 50%"], new Rectangle(0, 0, overlaySize, 15));
-        gfx.DrawText(_fonts["consolas-mid"], _brushes["green"], new Point(0, 0), " 2D Radar | Coder by : 에비츄(shlifedev)");
-        gfx.DrawText(_fonts["consolas"], _brushes["white"], new Point(0, overlaySize - 18), " 플레이어 수 : " + CheatBase.Instance.RealPlayerInstance.Count);
-        foreach (var x in CheatBase.Instance.RealPlayerInstance)
+        gfx.ClearScene(_brushes["black 50%"]); 
+    
+        DrawCreatorInfo(gfx);
+        DrawPlayerCount(gfx);
+        foreach (var playerInstance in CheatBase.Instance.RealPlayerInstance)
         {
-            var pos = Vector2.Zero;
-            var playerBrush = _brushes["black"];
+            playerInstance.ReadMemory();
+            Vector2 playerPosition = playerInstance.Position;
+            SolidBrush playerInstanceBrush = _brushes["black"];  
+            var overlayPosition = Vec2ToOverlayPos(playerPosition);
+            RenderPlayer(gfx, playerInstance);
+            RenderDeadBody(gfx, playerInstance);
 
-
-
-            if (x.isOther && x.isMine == false)
-                pos = x.Instance.GetSyncPosition();
-            else if (x.isMine)
-                pos = x.Instance.GetMyPosition();
-
-
-             
-
-            var overlayX = (overlaySize/2) + (overlaySize * ((pos.x +center) / map_size));
-            var overlayY = (overlaySize/2) - (overlaySize * ((pos.y -center) / map_size));
-
-            x.ReadMemory();
-            x.ObserveState();
-             
-            if (x.PlayerInfo.Value.IsImpostor == 1)
-            {
-                gfx.DrawText(_fonts["arial_small"], _brushes["red"], new Point(overlayX, overlayY - 5), "임포스터");
-            }
-            if (x.PlayerInfo.Value.IsDead == 1)
-            {
-                playerBrush = _brushes[$"player_color_{x.PlayerInfo.Value.ColorId}_dead"];
-                Vector2 diePos = Vector2.Zero;
-                _diedPlayersMap.TryGetValue(x.PlayerInfo.Value.ColorId, out diePos);
-                if (diePos.IsZero() == false)
-                {
-                    var overlayPoint = GetRadarPosition(diePos);
-                    gfx.FillCircle(playerBrush, overlayPoint.X, overlayPoint.Y, 5);
-                    gfx.DrawText(_fonts["arial_small"], _brushes["red"], new Point(overlayPoint.X, overlayPoint.Y + 5), $"죽음");
-                }
-            }
-            else
-            {
-                playerBrush = _brushes[$"player_color_{x.PlayerInfo.Value.ColorId}"];
-                gfx.FillCircle(playerBrush, overlayX, overlayY, 4);
-            }
-            gfx.DrawText(_fonts["arial_small"], _brushes["white"], new Point(overlayX, overlayY - 15), $"{pos.x.ToString("0.0")},{pos.y.ToString("0.0")}");
-      
+            //debug
+            gfx.DrawText(_fonts["arial_small"], _brushes["white"], new Point(overlayPosition.X, overlayPosition.Y - 15), $"{playerPosition.x.ToString("0.0")},{playerPosition.y.ToString("0.0")}");
         }
 
         if(drawDisable)
