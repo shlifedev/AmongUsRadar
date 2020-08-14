@@ -10,6 +10,16 @@ using GameOverlay.Windows;
 
 public class RadarOverlay : IDisposable
 { 
+
+    public static RadarOverlay Instance
+    {
+        get
+        {
+            if (instance == null) instance = new RadarOverlay();
+            return instance;
+        }
+    }
+    private static RadarOverlay instance;
     private readonly GraphicsWindow _window; 
     private readonly Dictionary<string, SolidBrush> _brushes;
     private readonly Dictionary<string, Font> _fonts;
@@ -241,7 +251,7 @@ public class RadarOverlay : IDisposable
     {
         _diedPlayersMap.Add(colorID, pos);
     }
-
+     
     public void Run()
     {
         _window.Create();

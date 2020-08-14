@@ -37,20 +37,20 @@ namespace AmongUsCheeseCake
                 {
                     var x = command.Split(' ');
                     var size = int.Parse(x[1]);
-                    CheatBase.Instance.radar.map_size = size;
+                    RadarOverlay.Instance.map_size = size;
                 }
                 if (command.ToLower().Contains("overlaysize"))
                 {
                     var x = command.Split(' ');
                     var size = int.Parse(x[1]);
-                    CheatBase.Instance.radar.SetWindowSize(size, size);
-                    CheatBase.Instance.radar.overlaySize = size;
+                    RadarOverlay.Instance.SetWindowSize(size, size);
+                     RadarOverlay.Instance.overlaySize = size;
                 }
                 if (command.ToLower().Contains("center"))
                 {
                     var x = command.Split(' ');
                     var size = int.Parse(x[1]);
-                    CheatBase.Instance.radar.center = size;
+                    RadarOverlay.Instance.center = size;
                 }
                 if (command.ToLower().Contains("soundmanager"))
                 {

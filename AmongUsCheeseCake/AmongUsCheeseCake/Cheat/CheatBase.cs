@@ -17,8 +17,26 @@ using System.Threading.Tasks;
 
 namespace AmongUsCheeseCake.Cheat
 {
+    public struct Rect
+    {
+        public int Left { get; set; }
+        public int Top { get; set; }
+        public int Right { get; set; }
+        public int Bottom { get; set; }
+    }
+
+
     public class CheatBase
     {
+        #region externs
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        public static extern IntPtr FindWindow(string strClassName, string strWindowName);
+
+        [DllImport("user32.dll")]
+        public static extern bool GetWindowRect(IntPtr hwnd, ref Rect rectangle);
+        #endregion
+
+        #region singleton
         public static CheatBase Instance
         {
             get
@@ -31,36 +49,29 @@ namespace AmongUsCheeseCake.Cheat
             }
         }
         private static CheatBase m_instance;
-        public struct Rect
-        {
-            public int Left { get; set; }
-            public int Top { get; set; }
-            public int Right { get; set; }
-            public int Bottom { get; set; }
-        }
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        public static extern IntPtr FindWindow(string strClassName, string strWindowName);
+        #endregion
 
-        [DllImport("user32.dll")]
-        public static extern bool GetWindowRect(IntPtr hwnd, ref Rect rectangle);
-          
 
+        #region memory_tools
         public static Mem Memory = new Mem();
         public static MemorySharp MemorySharp;
         public static ProcessMemory ProcessMemory;
-        private string m_cached_gameDataOffset = null; 
+        #endregion
+
+
+        #region readed_memorys
         private List<CachedPlayerControllInfo> SearchedPlayerList = new List<CachedPlayerControllInfo>();
         public List<CachedPlayerControllInfo> RealPlayerInstance = new List<CachedPlayerControllInfo>();
-        public int localNetworkID = 483328960;
-        public RadarOverlay radar;
+        #endregion
+
+
+        #region threads
         private Thread tickThread = null;
         private Thread radarThread = null;
-
- 
-        public bool drawDisable = false;
+        #endregion
 
 
-        List<CachedPlayerControllInfo> SearchPlayersWithoutMine()
+        public List<CachedPlayerControllInfo> SearchAllPlayers()
         {
 
             List<CachedPlayerControllInfo> list = new List<CachedPlayerControllInfo>();
@@ -81,34 +92,13 @@ namespace AmongUsCheeseCake.Cheat
                         offset = x.GetAddress(),
                         offset_ptr = new IntPtr((int)x)
                     });
-                }
-                else
-                {
-
-                }
+                } 
             }
             return list;
         }
 
 
-        List<PlayerControll> SearchAllPlayerInstance()
-        {
-
-            List<PlayerControll> list = new List<PlayerControll>();
-            var result = Memory.AoBScan(EngineOffset.Pattern.PlayerControl, true, true);
-            result.Wait();
-            var results =    result.Result;
-            foreach (var x in results)
-            {
-                var bytes = Memory.ReadBytes(x.GetAddress(), PlayerControll.SizeOf());
-                var playerControll = PlayerControll.FromBytes(bytes);
-                list.Add(playerControll);
-            }
-            return list;
-        }
-
-
-        void FindAllRealPlayerInstance()
+        public void FindAllRealPlayerInstance()
         {
             RealPlayerInstance.Clear();
             foreach (var x in SearchedPlayerList)
@@ -116,12 +106,9 @@ namespace AmongUsCheeseCake.Cheat
                 var vec2 = x.Instance.GetSyncPosition();
                 RealPlayerInstance.Add(x);
             }
-        }
+        } 
 
 
-
-
- 
         public void Init()
         {
      
@@ -199,16 +186,11 @@ namespace AmongUsCheeseCake.Cheat
             }
         }
 
-
-
-        public void ShowRadar()
-        {
-
-        }
+ 
         public void Tick()
         {
             Console.WriteLine("Start Tick Thread!");
-            SearchedPlayerList = SearchPlayersWithoutMine();
+            SearchedPlayerList = SearchAllPlayers();
             FindAllRealPlayerInstance();
 
             var proc = Process.GetProcessesByName("Among Us");
@@ -228,14 +210,13 @@ namespace AmongUsCheeseCake.Cheat
                         IntPtr ptr = lol.MainWindowHandle;
                         Rect rect = new Rect();
                         GetWindowRect(ptr, ref rect);
-                        radar.SetWindowPos(rect.Left + 9, rect.Top + 31);
-                        radar.drawDisable = false;
+                        RadarOverlay.Instance.SetWindowPos(rect.Left + 9, rect.Top + 31);
+                        RadarOverlay.Instance.drawDisable = false;
                     }
                     else
                     {
-                        radar.drawDisable = true;
-                    }
-              
+                        RadarOverlay.Instance.drawDisable = true;
+                    } 
                 }
 
 
@@ -252,21 +233,9 @@ namespace AmongUsCheeseCake.Cheat
         public void Radar()
         {
             Console.WriteLine("Start Radar Thread!");
-            radar = new RadarOverlay(); 
-            radar.Run();
+            RadarOverlay.Instance.Run();
         }
 
-
-        public GameData ReadGameData()
-        {
-            try
-            {
-                return GameData.FromBytes(Memory.ReadBytes(m_cached_gameDataOffset, GameData.SizeOf()));
-            }
-            catch
-            {
-                return null;
-            }
-        }
+         
     }
 }
