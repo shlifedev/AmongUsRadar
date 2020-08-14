@@ -19,6 +19,18 @@ namespace AmongUsCheeseCake.Cheat
 {
     public class CheatBase
     {
+        public static CheatBase Instance
+        {
+            get
+            {
+                if(m_instance == null)
+                {
+                    m_instance = new CheatBase();
+                }
+                return m_instance;
+            }
+        }
+        private static CheatBase m_instance;
         public struct Rect
         {
             public int Left { get; set; }
@@ -234,8 +246,7 @@ namespace AmongUsCheeseCake.Cheat
         public void Radar()
         {
             Console.WriteLine("Start Radar Thread!");
-            radar = new RadarOverlay();
-            radar.cb = this;
+            radar = new RadarOverlay(); 
             radar.Run();
         }
 

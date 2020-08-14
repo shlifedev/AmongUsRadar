@@ -18,20 +18,99 @@ namespace AmongUsCheeseCake.Cheat
         /// </summary>
         public System.Action<Vector2, byte> onDie;
 
+        /// <summary>
+        /// get_Data()의 method pointer
+        /// </summary>
+        public static IntPtr PlayerControl_GetData_Offset = IntPtr.Zero;
 
+        /// <summary>
+        /// 플레이어 Info의 Offset
+        /// </summary>
         private string playerInfoOffset = null;
+        /// <summary>
+        /// 플레이어 Info의 Offset Pointer
+        /// </summary>
         public IntPtr playerInfoOffset_ptr;
 
+        /// <summary>
+        /// 플레이어 인스턴스의 오프셋
+        /// </summary>
         public string offset;
+        /// <summary>
+        /// 플레이어 인스턴스의 포인터
+        /// </summary>
         public IntPtr offset_ptr;
+
+
         public PlayerControll Instance; 
+
+        /// <summary>
+        /// other 플레이어의 경우 true
+        /// </summary>
         public bool isOther = false;
-        public bool isMine; 
+        /// <summary>
+        /// 나 자신일 경우 true
+        /// </summary>
+        public bool isMine;  
+
         public Vector2 syncPos = Vector2.Zero; 
-        private bool observe_dieFlag = false;
 
-   
+ 
+        /// <summary>
+        /// PlayerInfo 가져오기 
+        /// </summary>
+        public PlayerInfo? PlayerInfo
+        {
+            get
+            {
+                if (m_pInfo == null)
+                { 
+                    if (PlayerControl_GetData_Offset == IntPtr.Zero)
+                    {
+                        var aobScan = CheatBase.Memory.AoBScan(EngineOffset.Pattern.PlayerControl_GetData);
 
+                        aobScan.Wait();
+                        if (aobScan.Result.Count() == 1)
+                            PlayerControl_GetData_Offset = (IntPtr)aobScan.Result.First();
+
+                        CheeseMenu.Instance.AddLog($"PlayerControl.GetData() Scanned! ({aobScan.Result.Count()})");
+                    }
+
+                    var scanTask = PlayerControl_GetData_Offset;
+
+
+                    if (PlayerControl_GetData_Offset != IntPtr.Zero)
+                    {
+                        var ptr = PlayerControl_GetData_Offset;
+                        var playerInfoAddress = CheatBase.ProcessMemory.CallFunction(ptr, this.offset_ptr);
+                        playerInfoOffset = playerInfoAddress.GetAddress();
+                        playerInfoOffset_ptr = (IntPtr)playerInfoAddress;
+
+
+                        PlayerInfo pInfo = Game.PlayerInfo.FromBytes(CheatBase.Memory.ReadBytes(playerInfoOffset, Game.PlayerInfo.SizeOf()));
+                        if (pInfo.IsDead == 1)
+                            observe_dieFlag = true;
+
+
+                        this.m_pInfo = pInfo;
+                        Console.WriteLine("PlayerControl.GetData() Scan Complete  " + playerInfoOffset);
+                    }
+                }
+                else
+                {
+                    PlayerInfo pInfo = Game.PlayerInfo.FromBytes(CheatBase.Memory.ReadBytes(playerInfoOffset, Game.PlayerInfo.SizeOf()));
+                    this.m_pInfo = pInfo;
+                }
+
+
+                return m_pInfo;
+            }
+        }
+        private PlayerInfo? m_pInfo = null;
+
+        /// <summary>
+        /// 해당 플레이어 현재위치 가져오기
+        /// </summary>
         public Vector2 Position
         {
             get
@@ -45,84 +124,40 @@ namespace AmongUsCheeseCake.Cheat
         }
 
 
+#region ObserveStates
+        private bool observe_dieFlag = false;
+#endregion
+        /// <summary>
+        /// State변경 감지
+        /// </summary>
         public void ObserveState()
         {
-            if(observe_dieFlag == false && PlayerInfo.Value.IsDead == 1)
+            if (PlayerInfo.HasValue)
             {
-                observe_dieFlag = true;
-                onDie?.Invoke(Position, PlayerInfo.Value.ColorId);
-            }
-        }
-
-
-        public void WM_SetImposter(byte x)
-        {
-            var xxx = playerInfoOffset_ptr.ToInt32() + 40;
-            Console.WriteLine(xxx.GetAddress());
-            CheatBase.Memory.WriteMemory(xxx.GetAddress(), "byte", x.ToString());
-        }
-        public void WM_SetDead(byte x)
-        {
-            var xxx = playerInfoOffset_ptr.ToInt32() + 41;
-            Console.WriteLine(xxx.GetAddress());
-            CheatBase.Memory.WriteMemory(xxx.GetAddress(), "byte", x.ToString());
-        }
-        public PlayerInfo? PlayerInfo
-        {
-            get
-            {
-                if(m_pInfo == null)
+                if (observe_dieFlag == false && PlayerInfo.Value.IsDead == 1)
                 {
-                    var scanTask = CheatBase.Memory.AoBScan(EngineOffset.Pattern.PlayerControl_GetData);
-                        scanTask.Wait();
-
-                    Console.WriteLine("PlayerControl.GetData() Scan Count => " + scanTask.Result.Count());
-
-                    if(scanTask.Result.Count() == 1)
-                    { 
-                        var ptr = (IntPtr)scanTask.Result.First();
-                        var playerInfoAddress = CheatBase.ProcessMemory.CallFunction(ptr, this.offset_ptr);
-                            playerInfoOffset = playerInfoAddress.GetAddress();
-                            playerInfoOffset_ptr = (IntPtr)playerInfoAddress;
-
-
-                        PlayerInfo pInfo = Game.PlayerInfo.FromBytes(CheatBase.Memory.ReadBytes(playerInfoOffset, Game.PlayerInfo.SizeOf()));
-                        if(pInfo.IsDead == 1)
-                            observe_dieFlag = true;
-
-
-                        this.m_pInfo = pInfo;
-                        Console.WriteLine("PlayerControl.GetData() Scan Complete  " + playerInfoOffset);
-                    }
+                    observe_dieFlag = true;
+                    onDie?.Invoke(Position, PlayerInfo.Value.ColorId);
                 }
-                else
-                {
-                    PlayerInfo pInfo = Game.PlayerInfo.FromBytes(CheatBase.Memory.ReadBytes(playerInfoOffset, Game.PlayerInfo.SizeOf()));
-                    this.m_pInfo = pInfo; 
-                }
-
-
-                return m_pInfo;
             }
-        }
+        } 
 
-        private PlayerInfo? m_pInfo = null;
+        public void WriteMemory_Imposter(byte value)
+        {
+            var targetPointer = playerInfoOffset_ptr.Sum(40);
+            Console.WriteLine(" PlayerInfo.IsImposter Offset => " + targetPointer.GetAddress());
+            CheatBase.Memory.WriteMemory(targetPointer.GetAddress(), "byte", value.ToString());
+        }
+        public void WriteMemory_IsDead(byte value)
+        {
+            var targetPointer = playerInfoOffset_ptr.Sum(41);
+            Console.WriteLine(" PlayerInfo.IsDead Offset => " + targetPointer.GetAddress());
+            CheatBase.Memory.WriteMemory(targetPointer.GetAddress(), "byte", value.ToString());
+        } 
+ 
         public void ReadMemory()
-        { 
-            Instance = PlayerControll.FromBytes(CheatBase.Memory.ReadBytes(offset, PlayerControll.SizeOf())); 
-        }
-
-        #region
-
-
-    
-
-        public void __setKillTimer()
         {
-
-        }
-
-
-        #endregion
+            Instance = PlayerControll.FromBytes(CheatBase.Memory.ReadBytes(offset, PlayerControll.SizeOf()));
+        } 
     }
 }

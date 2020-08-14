@@ -2,21 +2,19 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
+using AmongUsCheeseCake;
 using AmongUsCheeseCake.Cheat;
 using AmongUsCheeseCake.Game;
 using GameOverlay.Drawing;
 using GameOverlay.Windows;
 
 public class RadarOverlay : IDisposable
-{
-    public CheatBase cb;
-    private readonly GraphicsWindow _window;
-
+{ 
+    private readonly GraphicsWindow _window; 
     private readonly Dictionary<string, SolidBrush> _brushes;
     private readonly Dictionary<string, Font> _fonts;
     private readonly Dictionary<string, Image> _images;
-    public bool drawDisable = false;
-
+    public bool drawDisable = false; 
     private readonly Dictionary<byte, Vector2> _diedPlayersMap;
     public float map_size = 50;
     public float overlaySize = 350;
@@ -142,7 +140,7 @@ public class RadarOverlay : IDisposable
     {
         if (_diePlayerFlag == false)
         {
-            foreach (var data in cb.RealPlayerInstance)
+            foreach (var data in CheatBase.Instance.RealPlayerInstance)
             {
                 _diePlayerFlag = true;
                 data.onDie += OnDiePlayer;
@@ -155,6 +153,8 @@ public class RadarOverlay : IDisposable
             _fullInit = true;
         }
     }
+
+     
     private void _window_DrawGraphics(object sender, DrawGraphicsEventArgs e)
     {
         if (_fullInit == false)
@@ -165,8 +165,8 @@ public class RadarOverlay : IDisposable
         gfx.ClearScene(_brushes["black 50%"]);
         gfx.FillRectangle(_brushes["black 50%"], new Rectangle(0, 0, overlaySize, 15));
         gfx.DrawText(_fonts["consolas-mid"], _brushes["green"], new Point(0, 0), " 2D Radar | Coder by : 에비츄(shlifedev)");
-        gfx.DrawText(_fonts["consolas"], _brushes["white"], new Point(0, overlaySize - 18), " 플레이어 수 : " + cb.RealPlayerInstance.Count);
-        foreach (var x in cb.RealPlayerInstance)
+        gfx.DrawText(_fonts["consolas"], _brushes["white"], new Point(0, overlaySize - 18), " 플레이어 수 : " + CheatBase.Instance.RealPlayerInstance.Count);
+        foreach (var x in CheatBase.Instance.RealPlayerInstance)
         {
             var pos = Vector2.Zero;
             var playerBrush = _brushes["black"];
@@ -186,6 +186,7 @@ public class RadarOverlay : IDisposable
 
             x.ReadMemory();
             x.ObserveState();
+             
             if (x.PlayerInfo.Value.IsImpostor == 1)
             {
                 gfx.DrawText(_fonts["arial_small"], _brushes["red"], new Point(overlayX, overlayY - 5), "임포스터");
