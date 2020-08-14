@@ -152,7 +152,16 @@ namespace AmongUsCheeseCake.Cheat
             Console.WriteLine(" PlayerInfo.IsDead Offset => " + targetPointer.GetAddress());
             CheatBase.Memory.WriteMemory(targetPointer.GetAddress(), "byte", value.ToString());
         } 
- 
+        /// <summary>
+        /// 킬 쿨타임 초기화
+        /// </summary>
+        /// <param name="value"></param>
+        public void WriteMemory_KillTimer(float value)
+        {
+            var targetPointer = offset_ptr.Sum(44);
+            Console.WriteLine(" PlayerControl.KillTimer Offset => " + targetPointer.GetAddress());
+            CheatBase.Memory.WriteMemory(targetPointer.GetAddress(), "float", value.ToString());
+        }
         public void ReadMemory()
         {
             Instance = PlayerControll.FromBytes(CheatBase.Memory.ReadBytes(offset, PlayerControll.SizeOf()));

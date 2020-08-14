@@ -19,10 +19,6 @@ namespace AmongUsCheeseCake.Cheat
             /// Get PlayerControl.Get_Data();
             /// </summary>
             public static string PlayerControl_GetData = "55 8B EC 80 3D 58 06 ??";
-        }
-        public sealed class PlayerControlPointer
-        {
-            public static IntPtr GetData = (IntPtr)0x516D5DF0;
-        }
+        } 
     }
 }
