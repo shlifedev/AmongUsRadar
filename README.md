@@ -1,23 +1,14 @@
 # AmongUsCheat
 
-  c# based amongus memory radar.
-  Reflection Class List Use by Cheatengine mono dissector.
- 
- 
-
-# 사용방법
- 1. 치트엔진의 모노 디섹터를 이용하여 **PlayerControl** 의 Static Offset을 찾습니다.
- 2. 이후, **PlayerControl** 의 모든 인스턴스를 AOB Scan하기위해 아무런 인스턴스의 주소값을 메모리뷰에서 찾아야합니다.
- 3. 메모리뷰에서 표시되는 첫 4바이트를 복사한후 코드내의 변수에 정의하고 (00 00 00 00 ?? ?? ?? ??) 게임 내에서 치트를 실행하면 됩니다.
- 
- 
+  C# Base AmongUs Cheese for Hamsters.
+  
  # Feature
   - 2D Radar
   - 2D Radar Player Color
   - 2D Radar Imposter
   - 2D Radar Latest Died Position
  
- 
+  
   - (Command) Set Imposter
   - (Command) Reset Dead Condition
  
@@ -28,8 +19,20 @@
   - Filter & Show Dead Player
   - Filter & Show Imposter
   - Method Hook
+  - GUI
   
+ ## Memo
+  개발로그
   
- # Memo
- https://stackoverflow.com/questions/25354393/passing-multiple-parameters-using-createremotethread-in-c-sharp
+ ### CreateRemoteThread Multi Param for c# 
+    https://stackoverflow.com/questions/25354393/passing-multiple-parameters-using-createremotethread-in-c-sharp
+    구조체를 Marshaling 한다음 포인터를 인자로 보낸다. 
+    
+ ### 지도대응 
  
+   지도 기준 좌표를 대응시키기위해 왼쪽 최상단 게임좌표, 우측 최하단 게임좌표를 구한후
+   지도의 이미지 크기 비율에 맞춰서 매칭시킨다.
+   
+ ### CLR Hosting
+  
+    https://www.unknowncheats.me/forum/general-programming-and-reversing/332825-inject-net-dll-using-clr-hosting.html
