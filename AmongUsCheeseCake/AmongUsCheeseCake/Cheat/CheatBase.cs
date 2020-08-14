@@ -75,7 +75,29 @@ namespace AmongUsCheeseCake.Cheat
         {
 
             List<CachedPlayerControllInfo> list = new List<CachedPlayerControllInfo>();
-            var result = Memory.AoBScan(EngineOffset.Pattern.PlayerControl, true, true);
+               
+            byte[] playerAoB = Memory.ReadBytes(EngineOffset.Pattern.PlayerControl_Pointer, PlayerControll.SizeOf());
+      
+            int cnt = 0;
+            string aobData = "";
+            foreach (var _byte in playerAoB)
+            { 
+                if(_byte < 16) 
+                    aobData += "0"+_byte.ToString("X"); 
+                else 
+                    aobData += _byte.ToString("X"); 
+              
+                if(cnt+1 != 4) 
+                    aobData += " ";
+
+                cnt++;
+                if (cnt == 4)
+                {
+                    aobData += " ?? ?? ?? ??"; 
+                    break;
+                } 
+            } 
+            var result = Memory.AoBScan(aobData, true, true);
             result.Wait();
             var results =    result.Result;
             foreach (var x in results)
