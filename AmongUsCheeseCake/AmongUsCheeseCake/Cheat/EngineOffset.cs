@@ -13,7 +13,7 @@ namespace AmongUsCheeseCake.Cheat
             /// <summary>
             /// Get PlayerControl Class 
             /// </summary>
-            public static string PlayerControl = "90 22 C8 07 ?? ?? ?? ??"; 
+            public static string PlayerControl = "78 E4 7E 06 ?? ?? ?? ??"; 
 
             /// <summary>
             /// Get PlayerControl.Get_Data();
