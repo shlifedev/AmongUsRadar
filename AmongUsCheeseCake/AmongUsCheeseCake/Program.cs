@@ -11,7 +11,7 @@ using Veldrid.StartupUtilities;
 namespace AmongUsCheeseCake
 {
 
-    public class TX
+    public class CheatWindow
     {
         private static Sdl2Window _sdlWindow;
         private static GraphicsDevice _graphicsDriver;
@@ -21,7 +21,7 @@ namespace AmongUsCheeseCake
         public void Run()
         {
             VeldridStartup.CreateWindowAndGraphicsDevice(
-                   new WindowCreateInfo(50, 50, 1280, 720, WindowState.Normal, "ImGui.NET Sample Program"),
+                   new WindowCreateInfo(50, 50, 500, 500, WindowState.Normal, "ImGui.NET Sample Program"),
                    new GraphicsDeviceOptions(true, null, true),
                    out _sdlWindow,
                    out _graphicsDriver);
@@ -30,6 +30,9 @@ namespace AmongUsCheeseCake
                 _graphicsDriver.MainSwapchain.Resize((uint)_sdlWindow.Width, (uint)_sdlWindow.Height);
                 _controller.WindowResized(_sdlWindow.Width, _sdlWindow.Height);
             };
+
+            _sdlWindow.BorderVisible = false;
+            
             _cl = _graphicsDriver.ResourceFactory.CreateCommandList();
             _controller = new ImGuiController(_graphicsDriver, _graphicsDriver.MainSwapchain.Framebuffer.OutputDescription, _sdlWindow.Width, _sdlWindow.Height);
         
@@ -65,8 +68,13 @@ namespace AmongUsCheeseCake
             // 1. Show a simple window.
             // Tip: if we don't call ImGui.BeginWindow()/ImGui.EndWindow() the widgets automatically appears in a window called "Debug".
             {
+                ImGui.SetNextWindowSize(new Vector2(500, 500), ImGuiCond.Appearing); 
+                ImGui.Begin("", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize |ImGuiWindowFlags.NoMove);
+                ImGui.SetWindowPos(new Vector2(0,0)); 
                 ImGui.Text("Hello, world!");
                 ImGui.Text($"Mouse position: {ImGui.GetMousePos()}");
+
+              
                 if (ImGui.Button("Button"))                                         // Buttons return true when clicked (NB: most widgets return true when edited/activated)
                 {
 
@@ -90,7 +98,7 @@ public class Program
     {
 
         CheatBase.Instance.Init();
-        TX t = new TX();
+        CheatWindow t = new CheatWindow();
         t.Run();
         while (true)
         {
