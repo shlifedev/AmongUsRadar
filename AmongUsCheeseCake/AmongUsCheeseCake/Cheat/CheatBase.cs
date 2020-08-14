@@ -127,14 +127,8 @@ namespace AmongUsCheeseCake.Cheat
                     tickThread.Abort();
                     tickThread = null;
                     Console.WriteLine("thread suspend..");
-                }
-
-                Thread t = new Thread(()=>{
-                    CheatWindow.Instance.Run();
-                });
-
-                t.Start();
-
+                } 
+                 
                 if (tickThread == null)
                     tickThread = new Thread(Tick);
 
@@ -217,9 +211,7 @@ namespace AmongUsCheeseCake.Cheat
                         Rect rect = new Rect();
                         GetWindowRect(ptr, ref rect);
                         RadarOverlay.Instance.SetWindowPos(rect.Left + 9, rect.Top + 31);
-                        RadarOverlay.Instance.drawDisable = false; 
-                        CheatWindow.Instance.SdlWindow.X = rect.Right;
-                        CheatWindow.Instance.SdlWindow.Y = rect.Top; 
+                        RadarOverlay.Instance.drawDisable = false;  
                     }
                     else
                     { 
