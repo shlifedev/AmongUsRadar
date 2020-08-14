@@ -23,35 +23,34 @@ namespace AmongUsCheeseCake
 
         static void Main(string[] args)
         {
-            
-            CheatBase cb = new CheatBase();
-            cb.Init();
+
+            CheatBase.Instance.Init();
 
             while (true)
             {
                 var command = Console.ReadLine();
                 if(command.ToLower().Contains("reset"))
                 {
-                    cb.Init();
+                    CheatBase.Instance.Init();
                 }
                 if (command.ToLower().Contains("mapsize"))
                 {
                     var x = command.Split(' ');
                     var size = int.Parse(x[1]);
-                    cb.radar.map_size = size;
+                    CheatBase.Instance.radar.map_size = size;
                 }
                 if (command.ToLower().Contains("overlaysize"))
                 {
                     var x = command.Split(' ');
                     var size = int.Parse(x[1]);
-                    cb.radar.SetWindowSize(size, size);
-                    cb.radar.overlaySize = size;
+                    CheatBase.Instance.radar.SetWindowSize(size, size);
+                    CheatBase.Instance.radar.overlaySize = size;
                 }
                 if (command.ToLower().Contains("center"))
                 {
                     var x = command.Split(' ');
                     var size = int.Parse(x[1]);
-                    cb.radar.center = size;
+                    CheatBase.Instance.radar.center = size;
                 }
                 if (command.ToLower().Contains("soundmanager"))
                 {
@@ -75,33 +74,33 @@ namespace AmongUsCheeseCake
                 }
                 if (command.ToLower().Contains("imposter"))
                 {
-                    foreach (var m in cb.RealPlayerInstance)
+                    foreach (var m in CheatBase.Instance.RealPlayerInstance)
                     {
                         if (m.isMine)
                         {
-                            m.WM_SetImposter(1);
+                            m.WriteMemory_Imposter(1);
                         }
                     }
 
                 }
                 if (command.ToLower().Contains("revive"))
                 {
-                    foreach (var m in cb.RealPlayerInstance)
+                    foreach (var m in CheatBase.Instance.RealPlayerInstance)
                     {
                         if (m.isMine)
                         {
-                            m.WM_SetDead(0);
+                            m.WriteMemory_IsDead(0);
                         }
                     }
 
                 }
                 if (command.ToLower().Contains("dead"))
                 {
-                    foreach (var m in cb.RealPlayerInstance)
+                    foreach (var m in CheatBase.Instance.RealPlayerInstance)
                     {
                         if (m.isMine)
                         {
-                            m.WM_SetDead(1);
+                            m.WriteMemory_IsDead(1);
                         }
                     }
 

@@ -71,9 +71,7 @@ namespace AmongUsCheeseCake.Cheat
 
                         aobScan.Wait();
                         if (aobScan.Result.Count() == 1)
-                            PlayerControl_GetData_Offset = (IntPtr)aobScan.Result.First();
-
-                        CheeseMenu.Instance.AddLog($"PlayerControl.GetData() Scanned! ({aobScan.Result.Count()})");
+                            PlayerControl_GetData_Offset = (IntPtr)aobScan.Result.First(); 
                     }
 
                     var scanTask = PlayerControl_GetData_Offset;
