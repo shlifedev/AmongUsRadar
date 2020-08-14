@@ -33,4 +33,6 @@
    지도 기준 좌표를 대응시키기위해 왼쪽 최상단 게임좌표, 우측 최하단 게임좌표를 구한후
    지도의 이미지 크기 비율에 맞춰서 매칭시킨다.
    
-
+ ### CLR Hosting
+  
+    https://www.unknowncheats.me/forum/general-programming-and-reversing/332825-inject-net-dll-using-clr-hosting.html
