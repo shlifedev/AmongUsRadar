@@ -148,6 +148,7 @@ public class RadarOverlay : IDisposable
 
     private void Init()
     {
+      
         if (_diePlayerFlag == false)
         {
             foreach (var data in CheatBase.Instance.RealPlayerInstance)
@@ -157,14 +158,23 @@ public class RadarOverlay : IDisposable
                 Console.WriteLine("Add Die Event");
             }
         }
+ 
 
-        if(_diePlayerFlag == true)
+        CheatBase.Instance.onInit += OnCheatInit;
+
+
+        if (_diePlayerFlag == true)
         {
             _fullInit = true;
         }
     }
 
 
+    public void OnCheatInit()
+    {
+        Console.WriteLine("OnCheatInit");
+         _diedPlayersMap.Clear();
+    }
 
     public void RenderPlayer(Graphics gfx, CachedPlayerControllInfo player)
     {
@@ -184,6 +194,7 @@ public class RadarOverlay : IDisposable
         var pInfo = player.PlayerInfo.Value;
         Vector2 diePos = Vector2.Zero;
         var b = _diedPlayersMap.TryGetValue(pInfo.ColorId, out diePos);
+        player.ObserveState();
         if(b)
         {
             SolidBrush circleBrush = _brushes[$"player_color_{pInfo.ColorId}_dead"];

@@ -114,6 +114,8 @@ namespace AmongUsCheeseCake.Cheat
             get
             {
                 if (isMine) return Instance.GetMyPosition();
+                if (!isOther) return Instance.GetMyPosition();
+
                 else
                 {
                     return Instance.GetSyncPosition();

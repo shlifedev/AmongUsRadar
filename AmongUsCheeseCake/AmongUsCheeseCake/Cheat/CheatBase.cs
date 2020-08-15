@@ -70,7 +70,7 @@ namespace AmongUsCheeseCake.Cheat
         private Thread radarThread = null;
         #endregion
 
-
+        public System.Action onInit;
         public List<CachedPlayerControllInfo> SearchAllPlayers()
         {
 
@@ -130,6 +130,7 @@ namespace AmongUsCheeseCake.Cheat
             }
         } 
 
+       
 
         public void Init()
         {
@@ -139,9 +140,10 @@ namespace AmongUsCheeseCake.Cheat
             Process proc = Process.GetProcessesByName("Among Us")[0];
             ProcessMemory = new ProcessMemory(proc);
             ProcessMemory.Open(ProcessAccess.AllAccess);
-   
+            onInit?.Invoke();
 
-             
+
+
             if (b)
             {
                 if (tickThread != null)
@@ -243,11 +245,7 @@ namespace AmongUsCheeseCake.Cheat
 
 
                 UpdatePlayerPosition();
-                foreach(var x in RealPlayerInstance)
-                {
-                    x.ObserveState();
-                }
-
+             
 
                 System.Threading.Thread.Sleep(10); 
             }
