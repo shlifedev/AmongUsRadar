@@ -2,6 +2,10 @@
 
   C# Base AmongUs Cheese for Hamsters.
   
+ # How to use
+  - CTRL + F5 :)
+  
+ 
  # Feature
   - 2D Radar
   - 2D Radar Player Color
