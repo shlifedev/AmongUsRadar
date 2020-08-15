@@ -11,25 +11,15 @@ namespace ProcessUtil
     [Flags()]
     public enum ProcessAccess : int
     {
-        /// <summary>Specifies all possible access flags for the process object.</summary>
         AllAccess = CreateThread | DuplicateHandle | QueryInformation | SetInformation | Terminate | VMOperation | VMRead | VMWrite | Synchronize,
-        /// <summary>Enables usage of the process handle in the CreateRemoteThread function to create a thread in the process.</summary>
         CreateThread = 0x2,
-        /// <summary>Enables usage of the process handle as either the source or target process in the DuplicateHandle function to duplicate a handle.</summary>
         DuplicateHandle = 0x40,
-        /// <summary>Enables usage of the process handle in the GetExitCodeProcess and GetPriorityClass functions to read information from the process object.</summary>
         QueryInformation = 0x400,
-        /// <summary>Enables usage of the process handle in the SetPriorityClass function to set the priority class of the process.</summary>
         SetInformation = 0x200,
-        /// <summary>Enables usage of the process handle in the TerminateProcess function to terminate the process.</summary>
         Terminate = 0x1,
-        /// <summary>Enables usage of the process handle in the VirtualProtectEx and WriteProcessMemory functions to modify the virtual memory of the process.</summary>
         VMOperation = 0x8,
-        /// <summary>Enables usage of the process handle in the ReadProcessMemory function to' read from the virtual memory of the process.</summary>
         VMRead = 0x10,
-        /// <summary>Enables usage of the process handle in the WriteProcessMemory function to write to the virtual memory of the process.</summary>
         VMWrite = 0x20,
-        /// <summary>Enables usage of the process handle in any of the wait functions to wait for the process to terminate.</summary>
         Synchronize = 0x100000
     }
 
@@ -37,10 +27,6 @@ namespace ProcessUtil
     {
         public static WindowsIdentity Identity = WindowsIdentity.GetCurrent();
 
-        /// <summary>
-        /// Returns if the current user (or rather current process context) has administrative priviledges
-        /// </summary>
-        /// <returns></returns>
         public static bool IsAdministrator()
         {
             bool isAdmin = false;
@@ -101,14 +87,6 @@ namespace ProcessUtil
         #endregion
 
         #region WINAPI DLL-IMPORTS
-        /// <summary>
-        /// Opens an existing local process object.
-        /// </summary>
-        /// <param name="dwDesiredAccess">The access to the process object. This access right is checked against the security descriptor for the process. This parameter can be one or more of the ProcessAccess-Flags</param>
-        /// <param name="bInheritHandle">If this value is TRUE, processes created by this process will inherit the handle. Otherwise, the processes do not inherit this handle.</param>
-        /// <param name="dwProcessId">The identifier of the local process to be opened. </param>
-        /// <returns>If the function succeeds, the return value is an open handle to the specified process. If the function fails, the return value is NULL.</returns>
-        /// Source: MSDN ( http://msdn.microsoft.com/en-us/library/ms684320%28VS.85%29.aspx )
         [DllImport("kernel32.dll")]
         public static extern IntPtr OpenProcess(ProcessAccess dwDesiredAccess, [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle, int dwProcessId);
 
@@ -174,8 +152,7 @@ namespace ProcessUtil
         public ProcessAccess AccessFlags { get { return this.m_ProcessAccess; } }
         public bool Opened { get { return (this.m_Handle != IntPtr.Zero); } }
         #endregion
-
-        /* memalloc: tries to alloc memory in the opened process */
+         
         public IntPtr MemAlloc(uint size)
         {
             return MemAlloc(IntPtr.Zero, size, AllocationType.Reserve | AllocationType.Commit , MemoryProtection.ExecuteReadWrite);
@@ -189,15 +166,7 @@ namespace ProcessUtil
         {
             return VirtualFreeEx(this.m_Handle, baseAddress, 0, AllocationType.Release);
         }
-
-        /// <summary>
-        /// Calls a function pointer in the remote process via CreateRemoteThread and waits for it to exit.
-        /// Returns the thread exit code, which is EAX by default.
-        /// (min-intrusive way to call the function of another process)
-        /// </summary>
-        /// <param name="functionPtr">Address of the remote function</param>
-        /// <param name="param">First parameter for the function</param>
-        /// <returns></returns>
+         
         public int CallFunction(IntPtr functionPtr, IntPtr param)
         {
             uint threadID;
@@ -227,135 +196,68 @@ namespace ProcessUtil
             WaitForSingleObject(hThread, 0xFFFFFFFF);
             GetExitCodeThread(hThread, out returnValue); 
             return (int)returnValue;
-        }
-
-        /// <summary>
-        /// Calls a function pointer in the remote process like 'CallFunction' but with SEH.
-        /// If the calling function throws an exception, it will be catched and the function returns 0xffffffff 
-        /// instead of crashing the whole remote process.
-        /// its like try { return CallFunction(...); } catch { return 0xffffffff; }
-        /// </summary>
-        /// <param name="functionPtr">Address of the remote function</param>
-        /// <param name="param">First parameter for the function</param>
-        /// <returns></returns>
+        } 
         public int SecureCallFunction(IntPtr functionPtr, IntPtr param)
         {
-            // SEH (execute with try/catch)
             byte[] SEHBegin = {
-                0x68, 0, 0, 0, 0,               // PUSH [ERRORHANDLER] - pointer to error handler
-                0x64, 0xFF, 0x35, 0, 0, 0 ,0,   // PUSH DWORD PTR FS:[0]   - save old SE handler
-                0x64, 0x89, 0x25, 0, 0, 0, 0    // MOV DWORD PTR FS:[0],ESP - set new seh record
+                0x68, 0, 0, 0, 0,               // PUSH [ERRORHANDLER]- 
+                0x64, 0xFF, 0x35, 0, 0, 0 ,0,   // PUSH DWORD PTR FS:[0]   
+                0x64, 0x89, 0x25, 0, 0, 0, 0    // MOV DWORD PTR FS:[0],ESP 
             };
 
-            // alloc mem and write small asm function
             byte[] inline = {
-                0x68, 0, 0, 0, 0,           // PUSH [param]  - push the param onto the stack
-                0xFF, 0x15, 0, 0, 0, 0,     // CALL DWORD PTR DS:[0] - call functionPtr
-                0x59,                       // POP ECX - clean up stack
-                0xEB, 0x09                  // JUMP SHORT +9 - - jump to no error
+                0x68, 0, 0, 0, 0,           // PUSH [param]
+                0xFF, 0x15, 0, 0, 0, 0,     // CALL DWORD PTR DS:[0] -
+                0x59,                       // POP ECX -
+                0xEB, 0x09                  // JUMP SHORT +9 - 
             };
 
-            // End of SEH
             byte[] SEHEnd = {
-                0x8B, 0x64, 0xE4, 0x08,         // MOV ESP,DWORD PTR SS:[ESP+8] - error handler here... restore esp
+                0x8B, 0x64, 0xE4, 0x08,         // MOV ESP,DWORD PTR SS:[ESP+8]  
                 0x31, 0xC0,                     // XOR EAX,EAX  - set eax
                 0x83, 0xE8, 0x01,               // SUB EAX,1      to -1
-                0x64, 0x8F, 0x5, 0, 0, 0, 0,    // POP DWORD PTR FS:[0] - jump here if no error
+                0x64, 0x8F, 0x5, 0, 0, 0, 0,    // POP DWORD PTR FS:[0 
                 0x83, 0xC4, 0x4,                // ADD ESP,4
                 0xC3                            // RETN
             };
 
-            // length of asm code
             int codeLen = SEHBegin.Length + inline.Length + SEHEnd.Length;
-
-            // alloc memory for asm code + 4bytes for function pointer
             IntPtr destination = this.MemAlloc((uint) codeLen + 4);
-
-            // Fill in PUSH [param]
             Buffer.BlockCopy(BitConverter.GetBytes((int)param), 0, inline, 1, 4);
-
-            // Fill in error handler
-            int SEHandler = (int)destination + SEHBegin.Length + inline.Length; // calc ptr of SEHEnd
+            int SEHandler = (int)destination + SEHBegin.Length + inline.Length; //ㅇ
             Buffer.BlockCopy(BitConverter.GetBytes(SEHandler), 0, SEHBegin, 1, 4);
-
-            // Fill in functionPtr
             this.Write((IntPtr) ((int)destination + codeLen), BitConverter.GetBytes((int)functionPtr));
-            // Fill in functionPtr call
             Buffer.BlockCopy(BitConverter.GetBytes((int)destination + codeLen), 0, inline, 7, 4);
-
             this.Write(destination, SEHBegin);
             this.Write((IntPtr)((int)destination + SEHBegin.Length), inline);
             this.Write((IntPtr)((int)destination + SEHBegin.Length + inline.Length), SEHEnd);
-
-            // call the inline function
             int ret = this.CallFunction(destination, IntPtr.Zero);
-
-            // dealloc (free) mem
             bool success = this.MemFree(destination);
 
             return ret;
         }
 
-        /// <summary>
-        /// Calls a function pointer like 'CallFunction' but returns a float value instead.
-        /// </summary>
-        /// <param name="functionPtr">Address of the remote function</param>
-        /// <param name="param">First parameter for the function</param>
-        /// <returns></returns>
-        /*  Normally a function returns via EAX. This works for IntPtr or Int's but to get
-            the return as float we have to inject some asm since we have to pop the float value
-            from the FPU stack. Somehow tricky AND error-prone
-        */
+         
         public float CallFunctionFloat(IntPtr functionPtr, IntPtr param)
         {
-            float ret = 0;
-            /* SEH (execute with try/catch)
-                68 00000000     PUSH [ERRORHANDLER] // pointer to handler
-                64:FF35 0000000 PUSH DWORD PTR FS:[0]   // save old SE handler
-                64:8925 0000000 MOV DWORD PTR FS:[0],ESP // set new seh record
-                
-                // error prone asm here...
-              
-                8B64E4 08       MOV ESP,DWORD PTR SS:[ESP+8] // error handler
-                64:8F05 0000000 POP DWORD PTR FS:[0]
-                83C4 04         ADD ESP,4
-            */
-
-            /* alloc mem and write small asm function
-                68 [param]    PUSH [param]  // push the param onto the stack
-                FF15 00000000 CALL DWORD PTR DS:[0] // call functionPtr
-                D91D 00000000 FSTP DWORD PTR DS:[0] // FSTorePop (pop float from ST)
-                A1 00000000   MOV EAX,DWORD PTR DS:[0] // mov float into eax (default "return")
-                59            POP ECX // clean up stack
-                C3            RETN  // return
-             */
+            float ret = 0; 
 
             byte[] inline = { 0x68,0,0,0,0,0xFF, 0x15, 0, 0, 0, 0, 0xD9, 0x1D, 0, 0, 0, 0, 0xA1, 0, 0, 0, 0,0x59, 0xC3,0,0,0,0,0,0,0,0 };
 
-            // alloc mem
             IntPtr destination = this.MemAlloc((uint)inline.Length);
 
-            // Fill in PUSH [param]
             Buffer.BlockCopy(BitConverter.GetBytes((int)param), 0, inline, 1, 4);
 
-            // Fill in functionPtr to call
             Buffer.BlockCopy(BitConverter.GetBytes((int)functionPtr), 0, inline, 24, 4);
             Buffer.BlockCopy(BitConverter.GetBytes((int)destination + 24), 0, inline, 7, 4);
 
-            // Fill in pointer to return value position
             byte[] pReturnValue = BitConverter.GetBytes((int)destination + 28);
             Buffer.BlockCopy(pReturnValue, 0, inline, 13, 4);
             Buffer.BlockCopy(pReturnValue, 0, inline, 18, 4);
 
-            this.Write(destination, inline);
-
-            // call the inline function
-            int littleEndian = this.CallFunction(destination, IntPtr.Zero);
-            
-            // convert the return float
-            ret = BitConverter.ToSingle(BitConverter.GetBytes(littleEndian).ToArray(), 0);
-
-            // dealloc (free) mem
+            this.Write(destination, inline); 
+            int littleEndian = this.CallFunction(destination, IntPtr.Zero);  
+            ret = BitConverter.ToSingle(BitConverter.GetBytes(littleEndian).ToArray(), 0); 
             bool success = this.MemFree(destination);
 
             return ret;
@@ -408,12 +310,8 @@ namespace ProcessUtil
                 buffer = null;
             
             return buffer;
-        }
-        /// <summary>
-        /// Returns address a pointer is pointing to :P
-        /// </summary>
-        /// <param name="address"></param>
-        /// <returns></returns>
+        } 
+
         public IntPtr ReadPointer(IntPtr address)
         {
             return this.ReadPointer(address, 0);
@@ -434,14 +332,7 @@ namespace ProcessUtil
             }
 
             return ret;
-        }
-
-        /// <summary>
-        /// Writes stuff to the process' memory
-        /// </summary>
-        /// <param name="BaseAddress">Address to write to</param>
-        /// <param name="data">Data to write</param>
-        /// <returns></returns>
+        }         
         public bool Write(IntPtr BaseAddress, byte[] data)
         {
             int bytesWritten = 0;
@@ -467,7 +358,7 @@ namespace ProcessUtil
                 else
                     break;
                 address = (uint)m.BaseAddress + (uint)m.RegionSize;
-            } while (address!=0); //HARDCORE! :P
+            } while (address!=0); 
 
             return (MEMORY_BASIC_INFORMATION[]) ret.ToArray(typeof(MEMORY_BASIC_INFORMATION));
         }
