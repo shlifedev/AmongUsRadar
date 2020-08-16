@@ -77,6 +77,17 @@ namespace AmongUsCheeseCake
                     }
 
                 }
+                if (command.ToLower().Contains("innocent"))
+                {
+                    foreach (var m in CheatBase.Instance.RealPlayerInstance)
+                    {
+                        if (m.isMine)
+                        {
+                            m.WriteMemory_Imposter(0);
+                        }
+                    }
+
+                }
                 if (command.ToLower().Contains("revive"))
                 {
                     foreach (var m in CheatBase.Instance.RealPlayerInstance)

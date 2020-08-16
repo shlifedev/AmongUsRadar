@@ -207,6 +207,7 @@ namespace AmongUsCheeseCake.Cheat
             if (cnt == RealPlayerInstance.Count-1)
             {
                 pc.isMine = true; 
+               
             }
         }
 
@@ -216,7 +217,7 @@ namespace AmongUsCheeseCake.Cheat
             Console.WriteLine("Start Tick Thread!");
             SearchedPlayerList = SearchAllPlayers();
             FindAllRealPlayerInstance();
-
+            RadarOverlay.Instance.Init();
             var proc = Process.GetProcessesByName("Among Us");
 
             bool test_rect = true;
@@ -245,7 +246,7 @@ namespace AmongUsCheeseCake.Cheat
 
 
                 UpdatePlayerPosition();
-             
+                                        
 
                 System.Threading.Thread.Sleep(10); 
             }

@@ -10,6 +10,10 @@ using GameOverlay.Windows;
 
 public class RadarOverlay : IDisposable
 { 
+    public enum Map
+    {
+        Skeld, Unknown, Polus
+    }
 
     public static RadarOverlay Instance
     {
@@ -19,6 +23,10 @@ public class RadarOverlay : IDisposable
             return instance;
         }
     }
+
+    Image polus_img = null;
+
+    public Map map;
     private static RadarOverlay instance;
     private readonly GraphicsWindow _window; 
     private readonly Dictionary<string, SolidBrush> _brushes;
@@ -26,8 +34,15 @@ public class RadarOverlay : IDisposable
     private readonly Dictionary<string, Image> _images;
     public bool drawDisable = false; 
     private readonly Dictionary<byte, Vector2> _diedPlayersMap;
-    public float map_size = 50;
-    public float overlaySize = 350;
+    /// <summary>
+    /// 오버레이 사이즈
+    /// </summary>
+    public  float overlaySize   = 350;
+    /// <summary>
+    /// 맵사이즈
+    /// </summary>
+    public  float map_size      = 50; 
+    public  float center        = 0; 
     public RadarOverlay()
     {
         _brushes = new Dictionary<string, SolidBrush>();
@@ -79,7 +94,7 @@ public class RadarOverlay : IDisposable
         _brushes["grid"] = gfx.CreateSolidBrush(255, 255, 255, 0.2f);
         _brushes["random"] = gfx.CreateSolidBrush(0, 0, 0);
         _brushes["black 50%"] = gfx.CreateSolidBrush(0, 0, 0, 0.5f);
-
+        polus_img = gfx.CreateImage(System.IO.File.ReadAllBytes("polus.png"));
 
 
 
@@ -131,7 +146,6 @@ public class RadarOverlay : IDisposable
     }
 
 
-    public float center = 0;
 
 
     public Point Vec2ToOverlayPos(Vector2 pos)
@@ -143,30 +157,23 @@ public class RadarOverlay : IDisposable
 
 
 
-    bool _diePlayerFlag = false;
-    bool _fullInit = false;
 
-    private void Init()
+
+    public void Init()
     {
-      
-        if (_diePlayerFlag == false)
-        {
-            foreach (var data in CheatBase.Instance.RealPlayerInstance)
-            {
-                _diePlayerFlag = true;
-                data.onDie += OnDiePlayer;
-                Console.WriteLine("Add Die Event");
-            }
+        foreach (var data in CheatBase.Instance.RealPlayerInstance)
+        { 
+            data.onDie += OnDiePlayer;
+            Console.WriteLine("Add Die Event");
         }
- 
 
-        CheatBase.Instance.onInit += OnCheatInit;
-
-
-        if (_diePlayerFlag == true)
+        CheatBase.Instance.onInit += OnCheatInit; 
+        if(map == Map.Polus)
         {
-            _fullInit = true;
+            this.center = -20;
+            this.map_size = 100;
         }
+    
     }
 
 
@@ -174,6 +181,8 @@ public class RadarOverlay : IDisposable
     {
         Console.WriteLine("OnCheatInit");
          _diedPlayersMap.Clear();
+
+    
     }
 
     public void RenderPlayer(Graphics gfx, CachedPlayerControllInfo player)
@@ -200,7 +209,7 @@ public class RadarOverlay : IDisposable
             SolidBrush circleBrush = _brushes[$"player_color_{pInfo.ColorId}_dead"];
             var overlayPoint = Vec2ToOverlayPos(diePos);
             gfx.FillCircle(circleBrush, overlayPoint.X, overlayPoint.Y, 5);
-            gfx.DrawText(_fonts["arial_small"], _brushes["red"], new Point(overlayPoint.X, overlayPoint.Y + 5), $"죽음");
+            gfx.DrawText(_fonts["arial_small"], _brushes["red"], new Point(overlayPoint.X, overlayPoint.Y + 5), $"DIE");
         }  
     }
 
@@ -214,7 +223,7 @@ public class RadarOverlay : IDisposable
     {
         gfx.DrawText(_fonts["consolas"], _brushes["white"], new Point(0, overlaySize - 36), " Player Count : " + CheatBase.Instance.RealPlayerInstance.Count);
 
-        string imposters = null;
+        string imposters = null; 
         foreach (var playerInstance in CheatBase.Instance.RealPlayerInstance)
         {
             PlayerInfo value = playerInstance.PlayerInfo.Value;
@@ -228,15 +237,13 @@ public class RadarOverlay : IDisposable
     }
     private void _window_DrawGraphics(object sender, DrawGraphicsEventArgs e)
     {
-        if (_fullInit == false)
-        {
-            Init();
-        }
+      
         var gfx = e.Graphics;
-        gfx.ClearScene(_brushes["black 50%"]); 
-    
+        gfx.ClearScene(_brushes["black 50%"]);  
         DrawCreatorInfo(gfx);
         DrawPlayerCount(gfx);
+        gfx.DrawImage(polus_img, new Point(0, 0), 1f);
+
         foreach (var playerInstance in CheatBase.Instance.RealPlayerInstance)
         {
             playerInstance.ReadMemory();
@@ -249,7 +256,7 @@ public class RadarOverlay : IDisposable
             //debug
             gfx.DrawText(_fonts["arial_small"], _brushes["white"], new Point(overlayPosition.X, overlayPosition.Y - 15), $"{playerPosition.x.ToString("0.0")},{playerPosition.y.ToString("0.0")}");
         }
-
+     
         if(drawDisable)
         {
             gfx.ClearScene();
