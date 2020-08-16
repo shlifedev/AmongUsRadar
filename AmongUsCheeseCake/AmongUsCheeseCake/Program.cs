@@ -107,9 +107,8 @@ namespace AmongUsCheeseCake
                         {
                             m.WriteMemory_IsDead(1);
                         }
-                    }
-
-                }
+                    } 
+                } 
             }
 
             System.Threading.Thread.Sleep(100000000);
