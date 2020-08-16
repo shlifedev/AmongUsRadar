@@ -186,7 +186,12 @@ namespace AmongUsCheeseCake.Cheat
                 else
                 {
                     if ((x.syncPos.x != test.x) || x.syncPos.y != test.y)
-                        x.isOther = true;  
+                    {
+                        if (x.isMine == false)
+                        {
+                            x.isOther = true;
+                        }
+                    }
                 }
             }
              

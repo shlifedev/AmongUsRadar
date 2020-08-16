@@ -25,7 +25,7 @@ public class RadarOverlay : IDisposable
     }
      
 
-    public Map map = Map.skeld;
+    public Map map = Map.polus;
     private static RadarOverlay instance;
     private readonly GraphicsWindow _window; 
     private readonly Dictionary<string, SolidBrush> _brushes;
@@ -105,7 +105,7 @@ public class RadarOverlay : IDisposable
         _brushes["player_color_3"] = gfx.CreateSolidBrush(255, 0, 204);
         _brushes["player_color_4"] = gfx.CreateSolidBrush(255, 102, 51);
         _brushes["player_color_5"] = gfx.CreateSolidBrush(255, 255, 051);
-        _brushes["player_color_6"] = gfx.CreateSolidBrush(51, 51, 51);
+        _brushes["player_color_6"] = gfx.CreateSolidBrush(150, 150, 150);
         _brushes["player_color_7"] = gfx.CreateSolidBrush(255, 255, 255);
         _brushes["player_color_8"] = gfx.CreateSolidBrush(102, 0, 153);
         _brushes["player_color_9"] = gfx.CreateSolidBrush(102, 51, 0);
@@ -120,7 +120,7 @@ public class RadarOverlay : IDisposable
         _brushes["player_color_3_dead"] = gfx.CreateSolidBrush(255, 0, 204, 150);
         _brushes["player_color_4_dead"] = gfx.CreateSolidBrush(255, 102, 51, 150);
         _brushes["player_color_5_dead"] = gfx.CreateSolidBrush(255, 255, 051, 150);
-        _brushes["player_color_6_dead"] = gfx.CreateSolidBrush(51, 51, 51, 150);
+        _brushes["player_color_6_dead"] = gfx.CreateSolidBrush(150, 150, 150, 150);
         _brushes["player_color_7_dead"] = gfx.CreateSolidBrush(255, 255, 255, 150);
         _brushes["player_color_8_dead"] = gfx.CreateSolidBrush(102, 0, 153, 150);
         _brushes["player_color_9_dead"] = gfx.CreateSolidBrush(102, 51, 0, 150);
@@ -135,6 +135,8 @@ public class RadarOverlay : IDisposable
         _fonts["arial_small"] = gfx.CreateFont("Arial", 10);
         _fonts["consolas"] = gfx.CreateFont("Consolas", 13);
         _fonts["consolas-mid"] = gfx.CreateFont("Consolas", 11);
+
+
 
     }
 
@@ -171,8 +173,8 @@ public class RadarOverlay : IDisposable
         if(map == Map.polus)
         {
             this.center = -20;
-            this.map_size = 100;
-        }
+            this.map_size = 50;
+        } 
     
     }
 
@@ -197,6 +199,11 @@ public class RadarOverlay : IDisposable
             if (pInfo.IsImpostor == 1) 
                 gfx.DrawText(_fonts["arial_small"], _brushes["red"], new Point(overlayPosition.X, overlayPosition.Y - 5), "Imposter"); 
         } 
+
+        if(pInfo.ColorId == (int)ColorID.brown)
+        {
+            Console.WriteLine(player.isOther + "," + player.isMine);
+        }
     }
     public void RenderDeadBody(Graphics gfx, CachedPlayerControllInfo player)
     {
