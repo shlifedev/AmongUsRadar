@@ -178,7 +178,9 @@ namespace ProcessUtil
 
             return (int)returnValue;
         }
-
+        /// <summary>
+        /// Test
+        /// </summary>
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public struct RemoteThreadParams
         {
@@ -343,26 +345,7 @@ namespace ProcessUtil
 
         #endregion
 
-
-        public MEMORY_BASIC_INFORMATION[] MemoryRegions()
-        {
-            System.Collections.ArrayList ret = new System.Collections.ArrayList();
-            uint address = 0;
-            int result = 0;
-            do
-            {
-                MEMORY_BASIC_INFORMATION m = new MEMORY_BASIC_INFORMATION();
-                result = VirtualQueryEx(this.m_Handle, address, out m, Marshal.SizeOf(m));
-                if (result != 0)
-                    ret.Add(m);
-                else
-                    break;
-                address = (uint)m.BaseAddress + (uint)m.RegionSize;
-            } while (address!=0); 
-
-            return (MEMORY_BASIC_INFORMATION[]) ret.ToArray(typeof(MEMORY_BASIC_INFORMATION));
-        }
-
+ 
 
         #region DECLARE MEMBER-VARS
         protected Process m_Process;
