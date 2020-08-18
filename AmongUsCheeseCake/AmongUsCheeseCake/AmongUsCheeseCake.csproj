@@ -91,6 +91,7 @@
   <ItemGroup>
     <Compile Include="Cheat\CachedPlayerControllInfo.cs" />
     <Compile Include="Cheat\EngineOffset.cs" />
+    <Compile Include="Cheat\Logger.cs" />
     <Compile Include="Cheat\Radar.cs" />
     <Compile Include="Cheat\Utilis.cs" />
     <Compile Include="Game\GameData.cs" />

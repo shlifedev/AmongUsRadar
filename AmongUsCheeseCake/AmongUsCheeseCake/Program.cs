@@ -16,10 +16,9 @@ namespace AmongUsCheeseCake
         static void Main(string[] args)
         {
 
-
-            CheatBase.Instance.Init();
-
-
+            Logger.DateTimeLogging(true);
+            Logger.Log("Test Logging");
+            CheatBase.Instance.Init();  
             while (true)
             {
                 var command = Console.ReadLine();

@@ -71,15 +71,22 @@ namespace AmongUsCheeseCake.Cheat
         #endregion
 
         public System.Action onInit;
+
+
         public List<CachedPlayerControllInfo> SearchAllPlayers()
         {
-
+            // create cached player data list
             List<CachedPlayerControllInfo> list = new List<CachedPlayerControllInfo>();
-               
+
+            // find player pointer
             byte[] playerAoB = Memory.ReadBytes(EngineOffset.Pattern.PlayerControl_Pointer, PlayerControll.SizeOf());
       
+            
             int cnt = 0;
+            // aob pattern
             string aobData = "";
+
+            // read 4byte aob pattern.
             foreach (var _byte in playerAoB)
             { 
                 if(_byte < 16) 
@@ -97,17 +104,20 @@ namespace AmongUsCheeseCake.Cheat
                     break;
                 } 
             } 
+            // get result 
             var result = Memory.AoBScan(aobData, true, true);
             result.Wait();
             var results =    result.Result;
+            
+            // player
             foreach (var x in results)
             {
                 var bytes = Memory.ReadBytes(x.GetAddress(), PlayerControll.SizeOf());
                 var playerControll = PlayerControll.FromBytes(bytes);
-                // 모든 플레이어의 공통 owner id
+                // among us real instanced player ownerid is 257 :)
                 if (playerControll.OwnerId == 257 && playerControll.netId != 0)
                 {
-                    Console.WriteLine("add Players :: " + playerControll.PlayerId);
+                    Logger.Log("Add Player :: " + playerControll.PlayerId);
                     list.Add(new CachedPlayerControllInfo()
                     {
                         Instance = playerControll,
@@ -120,14 +130,14 @@ namespace AmongUsCheeseCake.Cheat
         }
 
 
-        public void FindAllRealPlayerInstance()
+        /// <summary>
+        /// init real player list.
+        /// </summary>
+        public void InitRealPlayerList()
         {
             RealPlayerInstance.Clear();
-            foreach (var x in SearchedPlayerList)
-            {
-                var vec2 = x.Instance.GetSyncPosition();
-                RealPlayerInstance.Add(x);
-            }
+            foreach (var x in SearchedPlayerList) 
+                RealPlayerInstance.Add(x); 
         } 
 
        
@@ -140,39 +150,38 @@ namespace AmongUsCheeseCake.Cheat
             Process proc = Process.GetProcessesByName("Among Us")[0];
             ProcessMemory = new ProcessMemory(proc);
             ProcessMemory.Open(ProcessAccess.AllAccess);
-            onInit?.Invoke();
-
-
+            onInit?.Invoke(); 
 
             if (b)
             {
+                // remove tick thread
                 if (tickThread != null)
                 {
                     tickThread.Abort();
                     tickThread = null;
-                    Console.WriteLine("thread suspend..");
-                } 
-                 
+                    Logger.Log("thread suspend..");
+                }
+
+                // create thread
                 if (tickThread == null)
                     tickThread = new Thread(Tick);
 
+                // create thread
                 if (radarThread == null)
                     radarThread = new Thread(Radar);
+
+                // clear list.
                 this.RealPlayerInstance.Clear();
                 this.SearchedPlayerList.Clear();
 
-
-
+                 
                 tickThread.Start();
                 if (radarThread.ThreadState == System.Threading.ThreadState.Unstarted)
                     radarThread.Start();
             }
         }
-
-        /// <summary>
-        /// 로깅 테스트
-        /// </summary>
-        public void UpdatePlayerPosition()
+         
+        public void FilterPlayerOwner()
         {
             foreach (var x in RealPlayerInstance)
             {
@@ -204,27 +213,25 @@ namespace AmongUsCheeseCake.Cheat
                     cnt++;
                     continue;
                 }
-                else
-                {
-                    pc = RealPlayerInstance[i];
-                }
+                else 
+                    pc = RealPlayerInstance[i]; 
             } 
-            if (cnt == RealPlayerInstance.Count-1)
-            {
-                pc.isMine = true; 
-               
-            }
+            if (cnt == RealPlayerInstance.Count-1) 
+                pc.isMine = true;   
         }
 
  
+
+
         public void Tick()
         {
-            Console.WriteLine("Start Tick Thread!");
+            Logger.Log("Start Tick Thread!"); 
             SearchedPlayerList = SearchAllPlayers();
-            FindAllRealPlayerInstance();
-            RadarOverlay.Instance.Init();
-            var proc = Process.GetProcessesByName("Among Us");
+            InitRealPlayerList();
 
+            RadarOverlay.Instance.Init();
+
+            var proc = Process.GetProcessesByName("Among Us"); 
             bool test_rect = true;
             if (proc != null)
             {
@@ -250,7 +257,7 @@ namespace AmongUsCheeseCake.Cheat
                 }
 
 
-                UpdatePlayerPosition();
+                FilterPlayerOwner();
                                         
 
                 System.Threading.Thread.Sleep(10); 
@@ -258,7 +265,7 @@ namespace AmongUsCheeseCake.Cheat
         }
         public void Radar()
         {
-            Console.WriteLine("Start Radar Thread!");
+            Logger.Log("Start Radar Thread!");
             RadarOverlay.Instance.Run();
         }
 

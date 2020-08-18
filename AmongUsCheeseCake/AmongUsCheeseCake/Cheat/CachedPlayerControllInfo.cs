@@ -91,7 +91,7 @@ namespace AmongUsCheeseCake.Cheat
 
 
                         this.m_pInfo = pInfo;
-                        Console.WriteLine("PlayerControl.GetData() Scan Complete  " + playerInfoOffset);
+                        Logger.Log("PlayerControl.GetData() Scan Complete  " + playerInfoOffset);
                     }
                 }
                 else
@@ -145,23 +145,27 @@ namespace AmongUsCheeseCake.Cheat
         public void WriteMemory_Imposter(byte value)
         {
             var targetPointer = playerInfoOffset_ptr.Sum(40);
-            Console.WriteLine(" PlayerInfo.IsImposter Offset => " + targetPointer.GetAddress());
+            Logger.Log(" PlayerInfo.IsImposter Offset => " + targetPointer.GetAddress());
             CheatBase.Memory.WriteMemory(targetPointer.GetAddress(), "byte", value.ToString());
         }
+        /// <summary>
+        /// Set Player Dead State.
+        /// </summary>
+        /// <param name="value"></param>
         public void WriteMemory_IsDead(byte value)
         {
             var targetPointer = playerInfoOffset_ptr.Sum(41);
-            Console.WriteLine(" PlayerInfo.IsDead Offset => " + targetPointer.GetAddress());
+            Logger.Log(" PlayerInfo.IsDead Offset => " + targetPointer.GetAddress());
             CheatBase.Memory.WriteMemory(targetPointer.GetAddress(), "byte", value.ToString());
         } 
         /// <summary>
-        /// 킬 쿨타임 초기화
+        /// Set Player KillTimer
         /// </summary>
         /// <param name="value"></param>
         public void WriteMemory_KillTimer(float value)
         {
             var targetPointer = offset_ptr.Sum(44);
-            Console.WriteLine(" PlayerControl.KillTimer Offset => " + targetPointer.GetAddress());
+            Logger.Log(" PlayerControl.KillTimer Offset => " + targetPointer.GetAddress());
             CheatBase.Memory.WriteMemory(targetPointer.GetAddress(), "float", value.ToString());
         }
         public void ReadMemory()
