@@ -1,17 +1,6 @@
 # AmongUsCheat
 
-  AmongUsMemory based radar cheat
-  
-  개발한지 좀 오래됐고, 어몽어스가 난독화를 적용함에 따라 소스코드를 그냥 배포해둘 예정
-  
-  [AmongUsMemory](https://github.com/shlifedev/AmongUsMemory) 프로젝트를 베이스로 개발했습니다
-  
-  
-  
-  
- # How to use
-  - CTRL + F5 :)
-  
+  [AmongUsMemory](https://github.com/shlifedev/AmongUsMemory) based simple radar example  
  
  # Feature
   - 2D Radar
